@@ -1,0 +1,9 @@
+<template>
+    <template if:true={recordId}>
+       <c-customer-interaction-timeline values-array={sortedArray} record-id={recordId}></c-customer-interaction-timeline>
+    </template>
+    <template if:true={expandList}>
+        <c-customer-interaction-timeline values-array={sortedArray}></c-customer-interaction-timeline>
+        
+    </template>
+</template>

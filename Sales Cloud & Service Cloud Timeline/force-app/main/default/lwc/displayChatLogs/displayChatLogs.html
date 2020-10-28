@@ -1,0 +1,17 @@
+<template>
+    <template if:true={openDetails}>
+    <section role="log" class="slds-chat">
+        <ul class="slds-chat-list">
+          <li class="slds-chat-listitem slds-chat-listitem_inbound">
+            <div class="slds-chat-message">
+              <div class="slds-chat-message__body">
+                <div class="slds-chat-message__text slds-chat-message__text_inbound" data-targetelement="div">
+                  <lightning-formatted-rich-text value={chat.Body}></lightning-formatted-rich-text>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </section>
+      </template>
+</template>

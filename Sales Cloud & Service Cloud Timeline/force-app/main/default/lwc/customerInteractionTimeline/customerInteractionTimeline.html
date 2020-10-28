@@ -1,0 +1,371 @@
+<template>
+  <div class="slds-scrollable header">
+    <template if:false={_callFromCaseViewComponent}>
+      <div class="slds-page-header">
+        <div class="slds-page-header__row">
+          <div class="slds-page-header__col-title">
+            <div class="slds-media">
+              <div class="slds-media__figure">
+                <span class="slds-icon_container slds-icon-standard-opportunity">
+
+                  <lightning-icon icon-name="standard:customer_360" size="medium" style="background:#42becd;"></lightning-icon>
+                </span>
+              </div>
+              <div class="slds-media__body"
+                style="display:flex;width:100%;align-items:center;justify-content:space-between;">
+                <div class="slds-page-header__name">
+                  <div class="slds-page-header__name-title">
+                    <h1>
+                      <span class="slds-page-header__title slds-truncate slds-align_absolute-center">Customer
+                        Interaction
+                        Timeline</span>
+
+                    </h1>
+                  </div>
+
+                </div>
+                <template if:false={caseView}>
+                  <lightning-button label="View Cases" onclick={showCaseView} style="float:right;">
+                  </lightning-button>
+                </template>
+                <template if:true={caseView}>
+                  <lightning-button label="Contact View" onclick={showCaseView} style="float:right;">
+                  </lightning-button>
+                </template>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <template if:false={caseView}>
+        <div class="btn-header">
+          <div style="position: relative;">
+            <lightning-icon icon-name="utility:filterList" size="x-small" data-elementtype="buttonicon"
+              style="padding: 5px;" onclick={showFilterPanel}></lightning-icon>
+
+            <template if:true={openFilter}>
+              <c-filter-records response-array={responseArray} onsendradiobutton={handleRadioButton}
+                selected-type={_selectedTypes} onfiltereddata={handleFilterData} selected-value={_selectedFilter}
+                selected-radio-button={_selectedRadioButton}></c-filter-records>
+            </template>
+          </div>
+          <div style="display: flex; width: 96%;justify-content:flex-end;margin-right:15px;">
+            <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+              <lightning-input type="text" value="" onchange={handleSearch} placeholder="Search Timeline"
+                style="width:70%;display:inline-flex;"></lightning-input>
+            </div>
+            <lightning-button label="Expand All" onclick={handleExpandAllAndCollapseAll} data-action="expandall"
+              style="margin-right: 5px;width:fit-content;"></lightning-button>
+            <lightning-button label="Collapse All" onclick={handleExpandAllAndCollapseAll} data-action="collapseall"
+              style="width:fit-content;"></lightning-button>
+          </div>
+        </div>
+      </template>
+    </template>
+
+    <template if:true={caseView}>
+      <c-case-view record-id={recordId}></c-case-view>
+    </template>
+
+    <template if:false={caseView}>
+      <template for:each={sortedArray} for:item="sortedItem">
+        <ul key={sortedItem.Id} class="slds-timeline">
+          <template if:true={sortedItem.CaseNumber}>
+            <li>
+              <div class="slds-timeline__item_expandable slds-timeline__item_task slds-is-open">
+                <div class="slds-media">
+                  <div class="slds-media__figure">
+                    <button class="slds-button slds-button_icon" aria-controls="task-item-error" onclick={getDetails}
+                      data-targetid={sortedItem.Id} aria-expanded="true">
+                      <lightning-icon icon-name="utility:chevronright" size="xx-small" data-icontype="chevron">
+                      </lightning-icon>
+
+                    </button>
+                    <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon">
+                      <lightning-icon icon-name="standard:case" size="small"></lightning-icon>
+                    </div>
+                  </div>
+                  <div class="slds-media__body">
+                    <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                      <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                        <h3 class="slds-truncate">
+                          <a href="javascript:void(0);">
+                            <strong onclick={handleRedirect} data-recid={sortedItem.Id}>{sortedItem.CaseNumber} |
+                              {sortedItem.Subject}</strong>
+                          </a>
+                        </h3>
+                      </div>
+                      <div class="slds-timeline__actions slds-timeline__actions_inline">
+                        <p class="slds-timeline__date">
+                          <lightning-formatted-date-time value={sortedItem.CreatedDate} year="numeric" day="2-digit"
+                            month="long" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                        </p>
+                      </div>
+                    </div>
+                    <template if:true={_callFromCaseViewComponent}>
+                      <c-case-view related-values={sortedItem}></c-case-view>
+                    </template>
+                    <template if:false={_callFromCaseViewComponent}>
+                      <c-case-details case-details={sortedItem} expand-all={openAll}></c-case-details>
+                    </template>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </template>
+          <template if:true={sortedItem.Content}>
+            <li>
+              <div class="slds-timeline__item_expandable slds-timeline__item_task slds-is-open">
+                <div class="slds-media">
+                  <div class="slds-media__figure">
+                    <button class="slds-button slds-button_icon" onclick={getDetails} data-targetid={sortedItem.Id}
+                      aria-controls="task-item-error" aria-expanded="true">
+                      <lightning-icon icon-name="utility:chevronright" size="xx-small" data-icontype="chevron">
+                      </lightning-icon>
+                    </button>
+                    <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon">
+                      <lightning-icon icon-name="standard:social" size="small"></lightning-icon>
+                    </div>
+
+                  </div>
+                  <div class="slds-media__body">
+                    <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                      <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                        <h3 class="slds-truncate">
+                          <a href="javascript:void(0);">
+                            <strong onclick={handleRedirect} data-recid={sortedItem.Id}>{sortedItem.Name} | Type:
+                              {sortedItem.MessageType}</strong>
+                          </a>
+                        </h3>
+                      </div>
+                      <div class="slds-timeline__actions slds-timeline__actions_inline">
+                        <p class="slds-timeline__date">
+                          <lightning-formatted-date-time value={sortedItem.CreatedDate} year="numeric" day="2-digit"
+                            month="long" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                        </p>
+                      </div>
+                    </div>
+                    <c-social-posts post-details={sortedItem} expand-all={openAll}></c-social-posts>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+          </template>
+
+          <template if:true={sortedItem.Body}>
+            <li>
+              <div class="slds-timeline__item_expandable slds-timeline__item_task slds-is-open">
+                <div class="slds-media">
+                  <div class="slds-media__figure">
+                    <button class="slds-button slds-button_icon" onclick={getDetails} data-targetid={sortedItem.Id}
+                      aria-controls="task-item-error" aria-expanded="true">
+                      <lightning-icon icon-name="utility:chevronright" size="xx-small" data-icontype="chevron">
+                      </lightning-icon>
+                    </button>
+                    <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon">
+                      <lightning-icon icon-name="standard:messaging_conversation" size="small"></lightning-icon>
+                    </div>
+
+                  </div>
+                  <div class="slds-media__body">
+                    <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                      <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                        <h3 class="slds-truncate">
+                          <a href="javascript:void(0);">
+                            <strong onclick={handleRedirect} data-recid={sortedItem.Id}>{sortedItem.Name} | Chat with
+                              {sortedItem.Contact.Name}</strong>
+                          </a>
+                        </h3>
+                      </div>
+                      <div class="slds-timeline__actions slds-timeline__actions_inline">
+                        <p class="slds-timeline__date">
+                          <lightning-formatted-date-time value={sortedItem.CreatedDate} year="numeric" day="2-digit"
+                            month="long" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                        </p>
+                      </div>
+                    </div>
+                    <c-display-chat-logs chat-details={sortedItem} expand-all={openAll}></c-display-chat-logs>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </template>
+
+          <template if:true={sortedItem.messagingSession}>
+            <li>
+              <div class="slds-timeline__item_expandable slds-timeline__item_task slds-is-open">
+                <div class="slds-media">
+                  <div class="slds-media__figure">
+                    <button class="slds-button slds-button_icon" data-targetid={sortedItem.messagingSession.Id}
+                      onclick={getDetails} aria-controls="task-item-error" aria-expanded="true">
+                      <lightning-icon icon-name="utility:chevronright" size="xx-small" data-icontype="chevron">
+                      </lightning-icon>
+                    </button>
+                    <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon">
+                      <lightning-icon icon-name="standard:messaging_session" size="small"></lightning-icon>
+                    </div>
+
+                  </div>
+                  <div class="slds-media__body">
+                    <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                      <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                        <h3 class="slds-truncate">
+                          <a href="javascript:void(0);">
+                            <strong onclick={handleRedirect}
+                              data-recid={sortedItem.messagingSession.Id}>{sortedItem.messagingSession.Name}| Messaging
+                              Session with
+                              {sortedItem.messagingSession.EndUserContact.Name}
+                            </strong>
+                          </a>
+                        </h3>
+                      </div>
+                      <div class="slds-timeline__actions slds-timeline__actions_inline">
+                        <p class="slds-timeline__date">
+                          <lightning-formatted-date-time value={sortedItem.messagingSession.CreatedDate} year="numeric"
+                            day="2-digit" month="long" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                        </p>
+                      </div>
+                    </div>
+                    <c-messaging-session-details session-details={sortedItem} expand-all={openAll}>
+                    </c-messaging-session-details>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </template>
+
+          <template if:true={sortedItem.Priority}>
+            <li>
+              <div class="slds-timeline__item_expandable slds-timeline__item_task slds-is-open">
+                <div class="slds-media">
+                  <div class="slds-media__figure">
+                    <button onclick={getDetails} data-targetid={sortedItem.Id} class="slds-button slds-button_icon"
+                      aria-controls="task-item-error" aria-expanded="true">
+                      <lightning-icon icon-name="utility:chevronright" size="xx-small" data-icontype="chevron">
+                      </lightning-icon>
+                    </button>
+                    <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon">
+                      <lightning-icon icon-name="standard:email" size="small"></lightning-icon>
+                    </div>
+
+                  </div>
+                  <div class="slds-media__body">
+                    <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                      <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                        <h3 class="slds-truncate">
+                          <a href="javascript:void(0);">
+                            <strong onclick={handleRedirect} data-recid={sortedItem.Id}>{sortedItem.Subject}
+                            </strong>
+                          </a>
+                        </h3>
+                      </div>
+                      <div class="slds-timeline__actions slds-timeline__actions_inline">
+                        <p class="slds-timeline__date">
+                          <lightning-formatted-date-time value={sortedItem.CreatedDate} year="numeric" day="2-digit"
+                            month="long" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                        </p>
+                      </div>
+                    </div>
+                    <c-display-email-details email={sortedItem} expand-all={openAll}></c-display-email-details>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </template>
+
+          <template if:true={sortedItem.Type}>
+            <li>
+              <div class="slds-timeline__item_expandable slds-timeline__item_task slds-is-open">
+                <div class="slds-media">
+                  <div class="slds-media__figure">
+                    <button class="slds-button slds-button_icon" data-targetid={sortedItem.Id} onclick={getDetails}
+                      aria-controls="task-item-error" aria-expanded="true">
+                      <lightning-icon icon-name="utility:chevronright" size="xx-small" data-icontype="chevron">
+                      </lightning-icon>
+                    </button>
+                    <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon">
+                      <lightning-icon icon-name="standard:call" size="small"></lightning-icon>
+                    </div>
+                  </div>
+                  <div class="slds-media__body">
+                    <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                      <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                        <h3 class="slds-truncate">
+                          <a href="javascript:void(0);">
+                            <strong onclick={handleRedirect} data-recid={sortedItem.Id}>{sortedItem.Subject} |
+                              {sortedItem.Status}</strong>
+                          </a>
+                        </h3>
+                      </div>
+                      <div class="slds-timeline__actions slds-timeline__actions_inline">
+                        <p class="slds-timeline__date">
+                          <lightning-formatted-date-time value={sortedItem.CreatedDate} year="numeric" day="2-digit"
+                            month="long" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                        </p>
+                      </div>
+                    </div>
+                    <c-call-details call-details={sortedItem} expand-all={openAll}></c-call-details>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </template>
+          <template if:false={sortedItem.CreatedDate}>
+            <template if:false={sortedItem.messagingSession}>
+              <div class="slds-page-header" style="margin-top:10px;">
+                <div class="slds-page-header__row">
+                  <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                      <div class="slds-media__body">
+                        <div class="slds-page-header__name">
+                          <div class="slds-page-header__name-title">
+                            <span class="slds-truncate" style="font-weight:bold;">Items with no cases attached</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <li style="margin-top:5px;">
+                <div class="slds-timeline__item_expandable slds-timeline__item_task slds-is-open">
+                  <div class="slds-media">
+                    <div class="slds-media__figure">
+                      <button class="slds-button slds-button_icon" aria-controls="task-item-error" onclick={getDetails}
+                        data-targetid={sortedItem.Id} aria-expanded="true">
+                        <lightning-icon icon-name="utility:chevronright" size="xx-small" data-icontype="chevron">
+                        </lightning-icon>
+
+                      </button>
+                      <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon">
+                        <lightning-icon icon-name="standard:resource_absence" size="small"></lightning-icon>
+                      </div>
+                    </div>
+                    <div class="slds-media__body">
+                      <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                        <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                          <h3 class="slds-truncate">
+                            <a href="javascript:void(0);">
+                              <strong onclick={handleRedirect} data-recid={sortedItem.Id}>No case attached</strong>
+                            </a>
+                          </h3>
+                        </div>
+
+                      </div>
+                      <template if:true={_callFromCaseViewComponent}>
+                        <c-case-view related-values={sortedItem}></c-case-view>
+                      </template>
+
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </template>
+          </template>
+        </ul>
+      </template>
+    </template>
+  </div>
+</template>

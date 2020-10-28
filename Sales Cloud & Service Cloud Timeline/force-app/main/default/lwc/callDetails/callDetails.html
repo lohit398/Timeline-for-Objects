@@ -1,0 +1,32 @@
+<template>
+    <template if:true={openDetails}>
+        <article class="slds-box slds-timeline__item_details slds-theme_shade slds-m-top_x-small slds-m-horizontal_xx-small slds-p-around_medium"  aria-hidden="false">
+          <ul class="slds-list_horizontal slds-wrap">
+            <li class="slds-grid slds-grid_vertical slds-size_1-of-2 slds-p-bottom_small">
+              <span class="slds-text-title slds-p-bottom_x-small">Assigned To</span>
+              <span class="slds-text-body_medium slds-truncate">
+                <a href="javascript:void(0);">{call.Who.Name}</a>
+              </span>
+            </li>
+            <li class="slds-grid slds-grid_vertical slds-size_1-of-2 slds-p-bottom_small">
+              <span class="slds-text-title slds-p-bottom_x-small">Status</span>
+              <span class="slds-text-body_medium slds-truncate" >
+                <a href="javascript:void(0);">{call.Status}</a>
+              </span>
+            </li>
+            <li class="slds-grid slds-grid_vertical slds-size_1-of-2 slds-p-bottom_small">
+              <span class="slds-text-title slds-p-bottom_x-small">Description</span>
+              <span class="slds-text-body_medium slds-truncate" >
+                <a href="javascript:void(0);">{call.Description}</a>
+              </span>
+            </li>
+          </ul>
+          <div>
+            <span class="slds-text-title">Related TO</span>
+            <template if:true={call.What}>
+              <p class="slds-p-top_x-small">{call.What.Name}</p>
+            </template>
+          </div>
+        </article>
+        </template>
+</template>

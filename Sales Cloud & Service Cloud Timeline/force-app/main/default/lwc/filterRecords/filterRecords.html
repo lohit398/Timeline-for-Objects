@@ -1,0 +1,325 @@
+<template>
+  <section
+    aria-label="Dialog title"
+    aria-describedby="popover-body-id"
+    class="slds-popover slds-nubbin_top-right filter-header"
+    role="dialog"
+  >
+    <div id="popover-body-id" class="slds-popover__body">
+      <div class="dateFilter slds-col--padded-large">
+        <legend
+          class="slds-form-element__legend slds-form-element__label slds-text-title--caps"
+        >
+          Date Range
+        </legend>
+        <div
+          class="slds-form-element__control content"
+          style="column-count: 2;"
+        >
+          <div>
+            <label
+              class="slds-radio uiLabel"
+              for="dateFilter0"
+              data-aura-class="uiLabel"
+            >
+              <span class=""></span>
+              <input
+                type="radio"
+                value="0"
+                name="dateFilters"
+                aria-describedby=""
+                id="dateFilter0"
+                onclick={handleDateValues}
+                class="uiInput uiInputRadio uiInput--default uiInput--radio"
+                data-aura-class="uiInput uiInputRadio uiInput--default uiInput--radio"
+                data-interactive-lib-uid="4"
+                data-filtervalue="0"
+              />
+              
+              <span class="slds-radio--faux slds-var-m-right_x-small"></span>
+              <span class="slds-form-element__label slds-m-right--none"
+                >All time</span
+              >
+            </label>
+          </div>
+          <div>
+            <label
+              class="slds-radio uiLabel"
+              for="dateFilter1"
+              data-aura-class="uiLabel"
+            >
+              <span class=""></span>
+              <input
+                type="radio"
+                value="15"
+                name="dateFilters"
+                aria-describedby=""
+                id="dateFilter1"
+                onclick={handleDateValues}
+                class="uiInput uiInputRadio uiInput--default uiInput--radio"
+                data-aura-class="uiInput uiInputRadio uiInput--default uiInput--radio"
+                data-interactive-lib-uid="4"
+                data-filtervalue="15"
+              />
+              <span class="slds-radio--faux slds-var-m-right_x-small"></span>
+              <span class="slds-form-element__label slds-m-right--none"
+                >Last 15 days</span
+              >
+            </label>
+          </div>
+          <div>
+            <label
+              class="slds-radio uiLabel"
+              for="dateFilter2"
+              data-aura-class="uiLabel"
+            >
+              <span class=""></span>
+              <input
+                type="radio"
+                value="7"
+                name="dateFilters"
+                aria-describedby=""
+                id="dateFilter2"
+                onclick={handleDateValues}
+                class="uiInput uiInputRadio uiInput--default uiInput--radio"
+                data-aura-class="uiInput uiInputRadio uiInput--default uiInput--radio"
+                data-interactive-lib-uid="4"
+                data-filtervalue="7"
+              />
+              <span class="slds-radio--faux slds-var-m-right_x-small"></span>
+              <span class="slds-form-element__label slds-m-right--none"
+                >Last 7 days</span
+              >
+            </label>
+          </div>
+          <div>
+            <label
+              class="slds-radio uiLabel"
+              for="dateFilter3"
+              data-aura-class="uiLabel"
+            >
+              <span class=""></span>
+              <input
+                type="radio"
+                value="30"
+                name="dateFilters"
+                aria-describedby=""
+                id="dateFilter3"
+                onclick={handleDateValues}
+                class="uiInput uiInputRadio uiInput--default uiInput--radio"
+                data-aura-class="uiInput uiInputRadio uiInput--default uiInput--radio"
+                data-interactive-lib-uid="4"
+                data-filtervalue="30"
+              />
+              <span class="slds-radio--faux slds-var-m-right_x-small"></span>
+              <span class="slds-form-element__label slds-m-right--none"
+                >Last 30 days</span
+              >
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="entityFilter slds-col--padded-large"
+        style="margin-top: 10px;"
+      >
+        <legend
+          class="slds-form-element__legend slds-form-element__label slds-text-title--caps"
+        >
+          Objects Type
+        </legend>
+        <div
+          class="slds-form-element__control content"
+          style="column-count: 2;"
+        >
+          <div>
+            <label
+              class="slds-checkbox uiLabel"
+              style="width:fit-content;"
+              for="entityFilterAll"
+              data-aura-class="uiLabel"
+            >
+              <span class=""></span>
+              <input
+                type="checkbox"
+                onclick={getObjectTypes}
+                name="allTypes"
+                id="entityFilterAll"
+                class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-aura-class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-interactive-lib-uid="13"
+                data-filtervalue="allTypes"
+              />
+              <span class="slds-checkbox--faux slds-var-m-right_x-small"></span>
+              <span class="slds-form-element__label slds-m-right--none"
+                >All Types</span
+              >
+            </label>
+          </div>
+          <div>
+            <label
+              class="slds-checkbox uiLabel"
+              for="entityFilter1"
+              style="width:fit-content;"
+              data-aura-class="uiLabel"
+            >
+              <span class=""></span>
+              <input
+                type="checkbox"
+                onclick={getObjectTypes}
+                name="emails"
+                id="entityFilter1"
+                class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-aura-class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-interactive-lib-uid="13"
+                data-filtervalue="emails"
+              />
+              <span class="slds-checkbox--faux slds-var-m-right_x-small"></span>
+              <span class="slds-form-element__label slds-m-right--none"
+                >Emails</span
+              >
+            </label>
+          </div>
+
+          <div>
+            <label
+              class="slds-checkbox uiLabel"
+              for="entityFilter2"
+              style="width:fit-content;"
+              data-aura-class="uiLabel"
+            >
+              <span class=""></span>
+              <input
+                type="checkbox"
+                onclick={getObjectTypes}
+                name="messaging"
+                id="entityFilter2"
+                class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-aura-class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-interactive-lib-uid="13"
+                data-filtervalue="messaging"
+              />
+              <span class="slds-checkbox--faux slds-var-m-right_x-small"></span>
+              <span class="slds-form-element__label slds-m-right--none"
+                >Messaging</span
+              >
+            </label>
+          </div>
+
+          <div>
+            <label
+              class="slds-checkbox uiLabel"
+              for="entityFilter3"
+              style="width:fit-content;"
+              data-aura-class="uiLabel"
+            >
+              <span class=""></span>
+              <input
+                type="checkbox"
+                onclick={getObjectTypes}
+                name="chats"
+                id="entityFilter3"
+                class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-aura-class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-interactive-lib-uid="13"
+                data-filtervalue="chats"
+              />
+              <span class="slds-checkbox--faux slds-var-m-right_x-small"></span>
+              <span class="slds-form-element__label slds-m-right--none"
+                >Chats</span
+              >
+            </label>
+          </div>
+
+          <div>
+            <label
+              class="slds-checkbox uiLabel"
+              for="entityFilter4"
+              style="width:fit-content;"
+              data-aura-class="uiLabel"
+            >
+              <span class=""></span>
+              <input
+                type="checkbox"
+                onclick={getObjectTypes}
+                name="calls"
+                id="entityFilter4"
+                class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-aura-class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-interactive-lib-uid="13"
+                data-filtervalue="calls"
+              />
+              <span class="slds-checkbox--faux slds-var-m-right_x-small"></span>
+              <span class="slds-form-element__label slds-m-right--none"
+                >Calls</span
+              >
+            </label>
+          </div>
+
+          <div>
+            <label
+              class="slds-checkbox uiLabel"
+              for="entityFilter5"
+              style="width:fit-content;"
+              data-aura-class="uiLabel"
+            >
+              <span class=""></span>
+              <input
+                type="checkbox"
+                onclick={getObjectTypes}
+                name="cases"
+                id="entityFilter5"
+                class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-aura-class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-interactive-lib-uid="13"
+                data-filtervalue="cases"
+              />
+              <span class="slds-checkbox--faux slds-var-m-right_x-small"></span>
+              <span class="slds-form-element__label slds-m-right--none"
+                >Cases</span
+              >
+            </label>
+          </div>
+          <div>
+            <label
+              class="slds-checkbox uiLabel"
+              for="entityFilter6"
+              style="width:fit-content;"
+              data-aura-class="uiLabel"
+            >
+              <span class=""></span>
+              <input
+                type="checkbox"
+                onclick={getObjectTypes}
+                name="posts"
+                id="entityFilter6"
+                class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-aura-class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"
+                data-interactive-lib-uid="13"
+                data-filtervalue="posts"
+              />
+              <span class="slds-checkbox--faux slds-var-m-right_x-small"></span>
+              <span class="slds-form-element__label slds-m-right--none"
+                >Social Posts</span
+              >
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="slds-modal__footer"
+      data-aura-class="runtime_sales_activitiesActivityTimeline2FilterMenu"
+    >
+      <button
+        class="slds-button slds-button_brand"
+        type="button"
+        onclick={handleDateFilter}
+      >
+        Apply
+      </button>
+    </div>
+  </section>
+</template>
