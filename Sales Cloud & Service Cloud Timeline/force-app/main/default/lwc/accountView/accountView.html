@@ -23,6 +23,16 @@
                                     </h1>
                                 </div>
                             </div>
+                            <template if:false={opportunityView}>
+                                <lightning-button label="View Opportunities" onclick={showOpportunityView}
+                                    style="float:right;">
+                                </lightning-button>
+                            </template>
+                            <template if:true={opportunityView}>
+                                <lightning-button label="View Contacts" onclick={showOpportunityView}
+                                    style="float:right;">
+                                </lightning-button>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -35,10 +45,7 @@
                     style="padding: 5px;" onclick={showFilterPanel}></lightning-icon>
 
                 <template if:true={openFilter}>
-                    <c-filter-records response-array={responseArray} onsendradiobutton={handleRadioButton}
-                        selected-type={_selectedTypes} onfiltereddata={handleFilterData}
-                        selected-value={_selectedFilter} selected-radio-button={_selectedRadioButton}>
-                    </c-filter-records>
+                    <c-filter-based-on-date onfiltereddata={handleFilterData} response-array={responseArray}></c-filter-based-on-date>
                 </template>
             </div>
             <div style="display: flex; width: 96%;justify-content:flex-end;margin-right:15px;">

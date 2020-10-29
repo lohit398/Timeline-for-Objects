@@ -12,6 +12,9 @@ export default class AccountView extends NavigationMixin(LightningElement) {
   responseArray;
   selectedId;
   openAll = false;
+  openFilter = false;
+  opportunityView = true;
+  _selectedFilter;
 
   // wire methods
   @wire(getOpportunities, { recordId: '$recordId' })
@@ -61,6 +64,46 @@ export default class AccountView extends NavigationMixin(LightningElement) {
     else {
       this.openAll = false;
     }
+  }
+
+  showFilterPanel(event) {
+    if (this.openFilter === false) {
+      this.template.querySelector('[data-elementtype="buttonicon"]').variant =
+        "inverse";
+
+      this.template.querySelector(
+        '[data-elementtype="buttonicon"]'
+      ).style.background = "rgb(28, 81, 151)";
+
+      this.openFilter = true;
+    } else {
+      this.template.querySelector('[data-elementtype="buttonicon"]').variant =
+        "";
+      this.template.querySelector(
+        '[data-elementtype="buttonicon"]'
+      ).style.background = "white";
+
+      this.openFilter = false;
+    }
+  }
+
+  handleSearch(event) {
+    //console.log(event.target.value);
+    if (event.target.value != "") {
+      this.sortedArray = this.responseArray.filter(item => {
+          if (item.Name.toLowerCase().includes(event.target.value.toLowerCase()))
+            return true;
+      })
+    }
+    else
+      this.sortedArray = this.responseArray;
+
+  }
+
+
+  handleFilterData(event) {
+    this.sortedArray = event.detail.filtered;
+    this._selectedFilter = event.detail.selected;
   }
 
 }

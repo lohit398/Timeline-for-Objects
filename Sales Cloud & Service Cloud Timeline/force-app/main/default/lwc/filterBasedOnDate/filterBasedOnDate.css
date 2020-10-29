@@ -1,0 +1,7 @@
+.filter-header {
+    position: absolute;
+    top: 125%;
+    right: -40%;
+    z-index: 9001;
+    opacity: 1;
+  }
