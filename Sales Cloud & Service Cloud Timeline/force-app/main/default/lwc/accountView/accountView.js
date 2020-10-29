@@ -1,5 +1,6 @@
 import { LightningElement, wire, api } from 'lwc';
 import getOpportunities from '@salesforce/apex/CustomerInteractionTimeline_helper.getOpportunities';
+import getContacts from '@salesforce/apex/CustomerInteractionTimeline_helper.getContacts';
 import { NavigationMixin } from "lightning/navigation";
 import { CurrentPageReference } from "lightning/navigation";
 import { fireEvent } from "c/pubsub";
@@ -15,6 +16,8 @@ export default class AccountView extends NavigationMixin(LightningElement) {
   openFilter = false;
   opportunityView = true;
   _selectedFilter;
+  contacts = [];
+  opportunities = [];
 
   // wire methods
   @wire(getOpportunities, { recordId: '$recordId' })
@@ -24,14 +27,8 @@ export default class AccountView extends NavigationMixin(LightningElement) {
     }
     else if (data) {
       this.responseArray = JSON.parse(JSON.stringify(data));
-
-      this.responseArray.sort((a, b) => {
-        let d = new Date(b.CreatedDate);
-        let c = new Date(a.CreatedDate);
-        console.log(d - c);
-        return d - c;
-      });
-      this.sortedArray = JSON.parse(JSON.stringify(this.responseArray));
+      this.opportunities = this.responseArray;
+      this.sortData();
     }
   }
 
@@ -91,8 +88,8 @@ export default class AccountView extends NavigationMixin(LightningElement) {
     //console.log(event.target.value);
     if (event.target.value != "") {
       this.sortedArray = this.responseArray.filter(item => {
-          if (item.Name.toLowerCase().includes(event.target.value.toLowerCase()))
-            return true;
+        if (item.Name.toLowerCase().includes(event.target.value.toLowerCase()))
+          return true;
       })
     }
     else
@@ -104,6 +101,50 @@ export default class AccountView extends NavigationMixin(LightningElement) {
   handleFilterData(event) {
     this.sortedArray = event.detail.filtered;
     this._selectedFilter = event.detail.selected;
+  }
+
+  showOpportunityView() {
+    if (this.opportunityView === false) {
+      this.opportunityView = true;
+      this.responseArray = JSON.parse(JSON.stringify(this.opportunities));
+      this.sortData();
+    }
+    else {
+      this.opportunityView = false;
+      this.getContacts();
+    }
+  }
+
+  /*supporting functions*/
+  // call to get the contacts from the org
+  getContacts() {
+    if (this.contacts.length === 0) {
+      getContacts({ recordId: this.recordId })
+        .then(response => {
+          this.responseArray = JSON.parse(JSON.stringify(response));
+          this.contacts = this.responseArray;
+          this.sortData();
+        })
+        .catch(error => {
+          console.log(error);
+        })
+    }
+    else{
+        this.responseArray = JSON.parse(JSON.stringify(this.contacts));
+        this.sortData();
+    }
+  }
+
+
+  // sort data based on date
+  sortData() {
+    this.responseArray.sort((a, b) => {
+      let d = new Date(b.CreatedDate);
+      let c = new Date(a.CreatedDate);
+      console.log(d - c);
+      return d - c;
+    });
+    this.sortedArray = JSON.parse(JSON.stringify(this.responseArray));
   }
 
 }
