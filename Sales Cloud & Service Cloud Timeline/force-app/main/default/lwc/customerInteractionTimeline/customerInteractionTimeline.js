@@ -2,6 +2,7 @@ import { LightningElement, api, track, wire } from "lwc";
 import getRecords from "@salesforce/apex/GetMultiObjectRecord.getRecords";
 import { CurrentPageReference } from "lightning/navigation";
 
+
 import { fireEvent } from "c/pubsub";
 import { NavigationMixin } from "lightning/navigation";
 
@@ -19,11 +20,12 @@ export default class MultiObjectViewAndMultiChannelView extends NavigationMixin(
   _selectedRadioButton;
   _selectedFilter = true;
   _initial = true;
-  _selectedTypes = []; 
-  
+  _selectedTypes = [];
   @track _callFromCaseViewComponent = false;
   @track caseView = false;
   @track relatedLists = [];
+
+
 
   @api
   get valuesArray() {
@@ -31,9 +33,9 @@ export default class MultiObjectViewAndMultiChannelView extends NavigationMixin(
   }
 
   set valuesArray(value) {
-    if(JSON.stringify(value) != "[]"){
+    if (JSON.stringify(value) != "[]") {
       this.sortedArray = value;
-      
+
     }
     this._callFromCaseViewComponent = true;
   }
@@ -61,29 +63,29 @@ export default class MultiObjectViewAndMultiChannelView extends NavigationMixin(
               : new Date(a.messagingSession.CreatedDate);
           return d - c;
         });
-        
+
         this.sortedArray = JSON.parse(JSON.stringify(this.responseArray));
       });
     }
 
   }
 
-  renderedCallback(){
-    if(this._initial && !this._callFromCaseViewComponent){
+  renderedCallback() {
+    if (this._initial && !this._callFromCaseViewComponent) {
       this.template.querySelector('.slds-scrollable').classList.add('parent-header');
       this._initial = false;
-    }  
+    }
   }
 
   getDetails(event) {
     this.selectedId = event.currentTarget.dataset.targetid;
 
-    if(this.template.querySelector('[data-targetid="'+this.selectedId+'"]').querySelector('[data-icontype="chevron"]').iconName === "utility:chevronright")
-      this.template.querySelector('[data-targetid="'+this.selectedId+'"]').querySelector('[data-icontype="chevron"]').iconName  =  "utility:chevrondown";
+    if (this.template.querySelector('[data-targetid="' + this.selectedId + '"]').querySelector('[data-icontype="chevron"]').iconName === "utility:chevronright")
+      this.template.querySelector('[data-targetid="' + this.selectedId + '"]').querySelector('[data-icontype="chevron"]').iconName = "utility:chevrondown";
     else
-      this.template.querySelector('[data-targetid="'+this.selectedId+'"]').querySelector('[data-icontype="chevron"]').iconName = "utility:chevronright"
-    
-    
+      this.template.querySelector('[data-targetid="' + this.selectedId + '"]').querySelector('[data-icontype="chevron"]').iconName = "utility:chevronright"
+
+
     fireEvent(this.pageRef, "selectedId", this.selectedId);
   }
 
@@ -126,9 +128,9 @@ export default class MultiObjectViewAndMultiChannelView extends NavigationMixin(
   }
 
   showCaseView(event) {
-    if(this.caseView === false)
+    if (this.caseView === false)
       this.caseView = true;
-    else if(this.caseView === true)
+    else if (this.caseView === true)
       this.caseView = false;
   }
 
@@ -142,30 +144,30 @@ export default class MultiObjectViewAndMultiChannelView extends NavigationMixin(
     this._selectedRadioButton = event.detail;
   }
 
-  handleSearch(event){
+  handleSearch(event) {
     //console.log(event.target.value);
-      if(event.target.value != ""){
-        this.sortedArray = this.responseArray.filter(item => {
-          if(item.CaseNumber)
-            if(item.CaseNumber.includes(event.target.value))
-              return true;
-          if(item.Subject)
-            if(item.Subject.includes(event.target.value))
-              return true;
-          if(item.messagingSession)
-            if(item.messagingSession.Name.includes(event.target.value))
-              return true;
-          if(item.Name)
-            if(item.Name.includes(event.target.value))
-              return true;
-          if(item.Content)
-            if(item.Content.includes(event.target.value))
-              return true;
-        })
-      }
+    if (event.target.value != "") {
+      this.sortedArray = this.responseArray.filter(item => {
+        if (item.CaseNumber)
+          if (item.CaseNumber.includes(event.target.value))
+            return true;
+        if (item.Subject)
+          if (item.Subject.includes(event.target.value))
+            return true;
+        if (item.messagingSession)
+          if (item.messagingSession.Name.includes(event.target.value))
+            return true;
+        if (item.Name)
+          if (item.Name.includes(event.target.value))
+            return true;
+        if (item.Content)
+          if (item.Content.includes(event.target.value))
+            return true;
+      })
+    }
     else
       this.sortedArray = this.responseArray;
-   
+
   }
 
 }

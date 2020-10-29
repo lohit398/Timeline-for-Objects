@@ -1,0 +1,8 @@
+<template>
+    <template if:true={_isSCObj}>
+        <c-customer-interaction-timeline record-id={recordId}></c-customer-interaction-timeline>
+    </template>
+    <template if:true={_isAccount}>
+        <c-account-view record-id={recordId}></c-account-view>
+    </template>
+</template>

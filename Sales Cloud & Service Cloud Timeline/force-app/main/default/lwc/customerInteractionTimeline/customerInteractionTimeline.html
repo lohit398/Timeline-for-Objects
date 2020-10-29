@@ -8,7 +8,8 @@
               <div class="slds-media__figure">
                 <span class="slds-icon_container slds-icon-standard-opportunity">
 
-                  <lightning-icon icon-name="standard:customer_360" size="medium" style="background:#42becd;"></lightning-icon>
+                  <lightning-icon icon-name="standard:customer_360" size="medium" style="background:#42becd;">
+                  </lightning-icon>
                 </span>
               </div>
               <div class="slds-media__body"
@@ -214,7 +215,8 @@
                         <h3 class="slds-truncate">
                           <a href="javascript:void(0);">
                             <strong onclick={handleRedirect}
-                              data-recid={sortedItem.messagingSession.Id}>{sortedItem.messagingSession.Name}| Messaging
+                              data-recid={sortedItem.messagingSession.Id}>{sortedItem.messagingSession.Name}|
+                              Messaging
                               Session with
                               {sortedItem.messagingSession.EndUserContact.Name}
                             </strong>
@@ -224,7 +226,8 @@
                       <div class="slds-timeline__actions slds-timeline__actions_inline">
                         <p class="slds-timeline__date">
                           <lightning-formatted-date-time value={sortedItem.messagingSession.CreatedDate} year="numeric"
-                            day="2-digit" month="long" hour="2-digit" minute="2-digit"></lightning-formatted-date-time>
+                            day="2-digit" month="long" hour="2-digit" minute="2-digit">
+                          </lightning-formatted-date-time>
                         </p>
                       </div>
                     </div>

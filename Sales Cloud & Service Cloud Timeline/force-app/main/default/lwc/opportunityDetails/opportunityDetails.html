@@ -1,0 +1,30 @@
+<template>
+    <template if:true={openDetails}>
+        <article class="slds-box slds-timeline__item_details slds-theme_shade slds-m-top_x-small slds-m-horizontal_xx-small slds-p-around_medium"  aria-hidden="false">
+          <ul class="slds-list_horizontal slds-wrap">
+            <li class="slds-grid slds-grid_vertical slds-size_1-of-2 slds-p-bottom_small">
+              <span class="slds-text-title slds-p-bottom_x-small">Opportunity Name</span>
+              <span class="slds-text-body_medium slds-truncate">
+                <a href="javascript:void(0);">{opp.Name}</a>
+              </span>
+            </li>
+            <li class="slds-grid slds-grid_vertical slds-size_1-of-2 slds-p-bottom_small">
+              <span class="slds-text-title slds-p-bottom_x-small">Opportunity Owner</span>
+              <span class="slds-text-body_medium slds-truncate" >
+                <a href="javascript:void(0);">{opp.Owner.Name}</a>
+              </span>
+            </li>
+            <li class="slds-grid slds-grid_vertical slds-size_1-of-2 slds-p-bottom_small">
+              <span class="slds-text-title slds-p-bottom_x-small">Opportunity Amount</span>
+              <span class="slds-text-body_medium slds-truncate">
+                <a href="javascript:void(0);">{opp.Amount}</a>
+              </span>
+            </li>
+          </ul>
+          <div>
+            <span class="slds-text-title">Stage</span>
+              <p class="slds-p-top_x-small">{opp.StageName}</p>
+          </div>
+        </article>
+        </template>
+</template>
