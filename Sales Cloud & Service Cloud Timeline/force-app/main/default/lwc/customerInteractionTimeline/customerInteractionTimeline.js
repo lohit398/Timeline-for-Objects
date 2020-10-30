@@ -9,6 +9,7 @@ import { NavigationMixin } from "lightning/navigation";
 export default class MultiObjectViewAndMultiChannelView extends NavigationMixin(
   LightningElement
 ) {
+  @api isLead;
   @wire(CurrentPageReference) pageRef;
   @api recordId;
   @track openAll = false;

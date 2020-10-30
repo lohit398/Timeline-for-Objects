@@ -25,13 +25,15 @@
                   </div>
 
                 </div>
-                <template if:false={caseView}>
-                  <lightning-button label="View Cases" onclick={showCaseView} style="float:right;">
-                  </lightning-button>
-                </template>
-                <template if:true={caseView}>
-                  <lightning-button label="Contact View" onclick={showCaseView} style="float:right;">
-                  </lightning-button>
+                <template if:false={isLead}>
+                  <template if:false={caseView}>
+                    <lightning-button label="View Cases" onclick={showCaseView} style="float:right;">
+                    </lightning-button>
+                  </template>
+                  <template if:true={caseView}>
+                    <lightning-button label="Contact View" onclick={showCaseView} style="float:right;">
+                    </lightning-button>
+                  </template>
                 </template>
               </div>
 
@@ -175,8 +177,14 @@
                       <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
                         <h3 class="slds-truncate">
                           <a href="javascript:void(0);">
-                            <strong onclick={handleRedirect} data-recid={sortedItem.Id}>{sortedItem.Name} | Chat with
-                              {sortedItem.Contact.Name}</strong>
+                            <template if:true={sortedItem.Contact}>
+                              <strong onclick={handleRedirect} data-recid={sortedItem.Id}>{sortedItem.Name} | Chat with
+                                {sortedItem.Contact.Name}</strong>
+                            </template>
+                            <template if:true={sortedItem.Lead}>
+                              <strong onclick={handleRedirect} data-recid={sortedItem.Id}>{sortedItem.Name} | Chat with
+                                {sortedItem.Lead.Name}</strong>
+                            </template>
                           </a>
                         </h3>
                       </div>
