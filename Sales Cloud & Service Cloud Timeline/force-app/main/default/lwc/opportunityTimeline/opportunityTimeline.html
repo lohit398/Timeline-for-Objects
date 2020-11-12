@@ -1,3 +1,149 @@
 <template>
+    <lightning-tabset variant="scoped">
+        <template if:true={oppData.stageChange}>
+            <lightning-tab label="Stage Changes">
+                <ul class="slds-timeline">
+                    <template for:each={oppData.stageChange} for:item="oppStageChange">
+                        <li key={oppStageChange.Id}>
+                            <div class="slds-timeline__item_expandable slds-timeline__item_task slds-is-open">
+                                <div class="slds-media">
+                                    <div class="slds-media__figure">
+                                        <button class="slds-button slds-button_icon" aria-controls="task-item-error"
+                                            aria-expanded="true">
+                                            <lightning-icon icon-name="utility:chevronright" size="xx-small"
+                                                data-icontype="chevron">
+                                            </lightning-icon>
+
+                                        </button>
+                                        <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon">
+                                            <lightning-icon icon-name="utility:change_record_type" size="small" style="background:white">
+                                            </lightning-icon>
+                                        </div>
+                                    </div>
+                                    <div class="slds-media__body">
+                                        <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                                            <div
+                                                class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                                                <h3 class="slds-truncate">
+                                                    <a href="javascript:void(0);">
+                                                        <strong>{oppStageChange.Current_Stage__c} |
+                                                            {oppStageChange.Previous_Stage__c}</strong>
+                                                    </a>
+                                                </h3>
+                                            </div>
+                                            <div class="slds-timeline__actions slds-timeline__actions_inline">
+                                                <p class="slds-timeline__date">
+                                                    <lightning-formatted-date-time
+                                                        value={oppStageChange.Change_Date_and_Time__c} year="numeric"
+                                                        day="2-digit" month="long" hour="2-digit" minute="2-digit">
+                                                    </lightning-formatted-date-time>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+
+            </lightning-tab>
+        </template>
+        <template if:true={oppData.oppProducts}>
+            <lightning-tab label="Products">
+                <ul class="slds-timeline">
+                    <template for:each={oppData.oppProducts} for:item="oppProduct">
+                        <li key={oppProduct.Id}>
+                            <div class="slds-timeline__item_expandable slds-timeline__item_task slds-is-open">
+                                <div class="slds-media">
+                                    <div class="slds-media__figure">
+                                        <button class="slds-button slds-button_icon" aria-controls="task-item-error"
+                                            aria-expanded="true">
+                                            <lightning-icon icon-name="utility:chevronright" size="xx-small"
+                                                data-icontype="chevron">
+                                            </lightning-icon>
+
+                                        </button>
+                                        <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon">
+                                            <lightning-icon icon-name="utility:products" size="small" style="background:white">
+                                            </lightning-icon>
+                                        </div>
+                                    </div>
+                                    <div class="slds-media__body">
+                                        <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                                            <div
+                                                class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                                                <h3 class="slds-truncate">
+                                                    <a href="javascript:void(0);">
+                                                        <strong>{oppProduct.Product2.Name} | Quantity:
+                                                            {oppProduct.Quantity}</strong>
+                                                    </a>
+                                                </h3>
+                                            </div>
+                                            <div class="slds-timeline__actions slds-timeline__actions_inline">
+                                                <p class="slds-timeline__date">
+                                                    <lightning-formatted-date-time
+                                                        value={oppProduct.CreatedDate} year="numeric"
+                                                        day="2-digit" month="long" hour="2-digit" minute="2-digit">
+                                                    </lightning-formatted-date-time>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+            </lightning-tab>
+        </template>
+        <template if:true={oppData.feedItems}>
+            <lightning-tab label="Chatter Posts">
+                <ul class="slds-timeline">
+                <template for:each={oppData.feedItems} for:item="oppFeedItem">
+                            <li key={oppFeedItem.Id}>
+                                <div class="slds-timeline__item_expandable slds-timeline__item_task slds-is-open">
+                                    <div class="slds-media">
+                                        <div class="slds-media__figure">
+                                            <button class="slds-button slds-button_icon" aria-controls="task-item-error"
+                                                aria-expanded="true">
+                                                <lightning-icon icon-name="utility:chevronright" size="xx-small"
+                                                    data-icontype="chevron">
+                                                </lightning-icon>
     
+                                            </button>
+                                            <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon">
+                                                <lightning-icon icon-name="utility:share_post" size="small" style="background:white">
+                                                </lightning-icon>
+                                            </div>
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                                                <div
+                                                    class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                                                    <h3 class="slds-truncate">
+                                                        <a href="javascript:void(0);">
+                                                            <strong><lightning-formatted-rich-text key={oppFeedItem.Id} value={oppFeedItem.Body}>
+                                                            </lightning-formatted-rich-text></strong>
+                                                        </a>
+                                                    </h3>
+                                                </div>
+                                                <div class="slds-timeline__actions slds-timeline__actions_inline">
+                                                    <p class="slds-timeline__date">
+                                                        <lightning-formatted-date-time
+                                                            value={oppFeedItem.CreatedDate} year="numeric"
+                                                            day="2-digit" month="long" hour="2-digit" minute="2-digit">
+                                                        </lightning-formatted-date-time>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </template>
+                    </ul>
+            </lightning-tab>
+        </template>
+    </lightning-tabset>
 </template>
