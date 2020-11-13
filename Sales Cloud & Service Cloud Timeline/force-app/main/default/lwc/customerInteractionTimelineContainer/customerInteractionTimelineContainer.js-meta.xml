@@ -5,4 +5,20 @@
     <targets>
         <target>lightning__RecordPage</target>
     </targets>
+
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <objects>
+                <object>Account</object>
+                <object>Lead</object>
+                <object>Opportunity</object>
+                <object>Contact</object>
+                <object>Case</object>
+                <object>LiveChatTranscript</object>
+                <object>SocialPost</object>
+                <object>MessagingSession</object>
+                <object>Task</object>
+            </objects>
+        </targetConfig>
+    </targetConfigs>
 </LightningComponentBundle>
