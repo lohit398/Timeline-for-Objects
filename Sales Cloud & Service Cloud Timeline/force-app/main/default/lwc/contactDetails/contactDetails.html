@@ -1,7 +1,7 @@
 <template>
     <!--this is a contact timeline-->
     <template if:true={openDetails}>
-        <div style="padding:15px;">
+        <div style="padding:7px;">
             <template for:each={sortedArray} for:item="sortedItem">
                 <ul key={sortedItem.Id} class="slds-timeline">
                     <template if:true={sortedItem.StageName}>
