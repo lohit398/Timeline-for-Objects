@@ -25,14 +25,20 @@ public class CustomerInteractionTimeline_helper {
     @AuraEnabled(cacheable=true)
     public static List<Opportunity> getOpportunitiesForContact(String recordId){
         // use the contact role isPrimary field
-        return [select Id,Name,CloseDate,Amount,Owner.Name,StageName,CreatedDate from Opportunity where Contact_person__c =: recordId];
+        List<OpportunityContactRole> oppContactRoles = [SELECT Id,ContactId, OpportunityId from OpportunityContactRole where ContactId =: recordId AND IsPrimary = true];
+        List<Id> oppIds = new List<Id>();
+        
+        for(OpportunityContactRole oppContact: oppContactRoles){
+            oppIds.add(oppContact.OpportunityId);
+        }
+        return [select Id,Name,CloseDate,Amount,Owner.Name,StageName,CreatedDate from Opportunity where Id IN :oppIds];
     }
     
     @AuraEnabled(cacheable=true)
     public static OpportunityTWrapper getOppotunitiesData(String recordId){
         List<OpportunityStage_Tracker__c> stageChanges = [SELECT Id,Current_Stage__c,Previous_Stage__c,Change_Date_and_Time__c,Name from OpportunityStage_Tracker__c where Name = :recordId ORDER BY Change_Date_and_Time__c ASC];
         List<FeedItem> oppFeedItems = [SELECT Id,Title,Body,ParentId,CreatedDate from FeedItem WHERE Type = 'TextPost' and ParentId =: recordId];
-        List<OpportunityLineItem> oppProductsLineItems = [SELECT Id,OpportunityId,Product2Id,Product2.Name from OpportunityLineItem Where OpportunityId = :recordId];
+        List<OpportunityLineItem> oppProductsLineItems = [SELECT Id,OpportunityId,Product2Id,Product2.Name,Quantity,CreatedDate from OpportunityLineItem Where OpportunityId = :recordId];
         OpportunityTWrapper obj = new OpportunityTWrapper();
         obj.stageChange = stageChanges;
         obj.feedItems = oppFeedItems;
