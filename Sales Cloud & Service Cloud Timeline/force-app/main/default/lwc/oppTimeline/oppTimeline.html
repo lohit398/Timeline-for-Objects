@@ -1,0 +1,95 @@
+<template>
+    <!--This is the timeline with feedItems and products-->
+    <template if:true={openDetails}>
+        <div style="padding:7px;">
+            <template for:each={sortedArray} for:item="item">
+                <ul key={item.stageChangeId} class="slds-timeline">
+                    <template if:true={item.Body}>
+                        <li>
+                            <div class="slds-timeline__item_expandable slds-timeline__item_task slds-is-open">
+                                <div class="slds-media">
+                                    <div class="slds-media__figure">
+                                        <button class="slds-button slds-button_icon" aria-controls="task-item-error"
+                                            aria-expanded="true">
+                                            <lightning-icon icon-name="utility:chevronright" size="xx-small"
+                                                data-icontype="chevron">
+                                            </lightning-icon>
+
+                                        </button>
+                                        <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon">
+                                            <lightning-icon icon-name="standard:post" size="small">
+                                            </lightning-icon>
+                                        </div>
+                                    </div>
+                                    <div class="slds-media__body">
+                                        <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                                            <div
+                                                class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                                                <h3 class="slds-truncate">
+                                                    <a href="javascript:void(0);">
+                                                        <strong><lightning-formatted-rich-text key={item.Id} value={item.Body}>
+                                                        </lightning-formatted-rich-text></strong>
+                                                    </a>
+                                                </h3>
+                                            </div>
+                                            <div class="slds-timeline__actions slds-timeline__actions_inline">
+                                                <p class="slds-timeline__date">
+                                                    <lightning-formatted-date-time
+                                                        value={item.CreatedDate} year="numeric"
+                                                        day="2-digit" month="long" hour="2-digit" minute="2-digit">
+                                                    </lightning-formatted-date-time>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+                    <template if:true={item.Product2Id}>
+                        <li>
+                            <div class="slds-timeline__item_expandable slds-timeline__item_task slds-is-open">
+                                <div class="slds-media">
+                                    <div class="slds-media__figure">
+                                        <button class="slds-button slds-button_icon" aria-controls="task-item-error"
+                                            aria-expanded="true">
+                                            <lightning-icon icon-name="utility:chevronright" size="xx-small"
+                                                data-icontype="chevron">
+                                            </lightning-icon>
+
+                                        </button>
+                                        <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon">
+                                            <lightning-icon icon-name="standard:products" size="small">
+                                            </lightning-icon>
+                                        </div>
+                                    </div>
+                                    <div class="slds-media__body">
+                                        <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                                            <div
+                                                class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                                                <h3 class="slds-truncate">
+                                                    <a href="javascript:void(0);">
+                                                        <strong>{item.Product2.Name} | Quantity:
+                                                            {item.Quantity}</strong>
+                                                    </a>
+                                                </h3>
+                                            </div>
+                                            <div class="slds-timeline__actions slds-timeline__actions_inline">
+                                                <p class="slds-timeline__date">
+                                                    <lightning-formatted-date-time
+                                                        value={item.CreatedDate} year="numeric"
+                                                        day="2-digit" month="long" hour="2-digit" minute="2-digit">
+                                                    </lightning-formatted-date-time>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+        </div>
+    </template>
+</template>
