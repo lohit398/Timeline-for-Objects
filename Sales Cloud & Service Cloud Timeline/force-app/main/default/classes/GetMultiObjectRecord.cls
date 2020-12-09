@@ -7,11 +7,16 @@ public with sharing class GetMultiObjectRecord {
         wrapperObject.sObjectType = sObjName;
         wrapperObject.getContactId();
         wrapperObject.getCases();
-        wrapperObject.getChatTranscripts();
-        wrapperObject.getConversationEntries();
         wrapperObject.getEmails();
         wrapperObject.getTasks();
-        wrapperObject.getSocialPosts();
+        
+        if(SObjectUtil.isObjectExist('LiveChatTranscript'))
+        	wrapperObject.getChatTranscripts();
+        if(SObjectUtil.isObjectExist('MessagingSession'))
+        	wrapperObject.getConversationEntries();
+        if(SObjectUtil.isObjectExist('SocialPost'))
+        	wrapperObject.getSocialPosts();
+        
         return wrapperObject;
     }
     public class Wrapper{
@@ -24,9 +29,9 @@ public with sharing class GetMultiObjectRecord {
         @AuraEnabled
         public list<Case> caseList {get;set;}
         @AuraEnabled
-        public list<MessagingSession> messagingList {get;set;}
+        public list<SObject> messagingList {get;set;}
         @AuraEnabled
-        public list<LiveChatTranscript> chatsList {get;set;}
+        public list<SObject> chatsList {get;set;}
         @AuraEnabled
         public String transcriptCompiler ='';
         @AuraEnabled
@@ -36,7 +41,7 @@ public with sharing class GetMultiObjectRecord {
         @AuraEnabled
         public List<Task> callTasks;
         @AuraEnabled
-        public List<SocialPost> socialPosts;
+        public List<SObject> socialPosts;
         @AuraEnabled
         public String contactId;
         @AuraEnabled
@@ -51,14 +56,18 @@ public with sharing class GetMultiObjectRecord {
                 contactId = [SELECT ContactId FROM Case WHERE Id =: this.recordId LIMIT 1].ContactId;
                 this.leadId = '';
             } else if(sObjectType == 'LiveChatTranscript') {
-                contactId = [SELECT ContactId From LiveChatTranscript WHERE Id =: this.recordId LIMIT 1].ContactId;
+                String query= 'SELECT ContactId From LiveChatTranscript WHERE Id =\''+String.valueOf(this.recordId)+'\' LIMIT 1';
+                SObject chatContact = Database.query(query);
+                contactId = String.valueOf(chatContact.get('ContactId'));
                 this.leadId = '';
             }
             else if(sObjectType == 'Task') {
                 contactId = [SELECT WhoId From Task WHERE Id =: this.recordId LIMIT 1].WhoId;
                 this.leadId = '';
             } else if(sObjectType == 'MessagingSession') {
-                contactId = [SELECT EndUserContactId FROM MessagingSession WHERE Id =: this.recordId LIMIT 1 ].EndUserContactId;
+                String query1= 'SELECT EndUserContactId From MessagingSession WHERE Id =\''+String.valueOf(this.recordId)+'\' LIMIT 1';
+                SObject messagingContact = Database.query(query1);
+                contactId = String.valueOf(messagingContact.get('EndUserContactId'));
                 this.leadId = '';
             }
             else if(sObjectType == 'Contact'){
@@ -66,7 +75,9 @@ public with sharing class GetMultiObjectRecord {
                 this.leadId = '';
             }
             else if(sObjectType == 'SocialPost'){
-                contactId = [SELECT WhoId from SocialPost where Id=: this.recordId LIMIT 1].Id;
+                String query2 = 'SELECT WhoId From SocialPost WHERE Id =\''+String.valueOf(this.recordId)+'\' LIMIT 1';
+                SObject socialPostContact = Database.query(query2);
+                contactId = String.valueOf(socialPostContact.get('WhoId'));
                 this.leadId = '';
             }
             else if(sObjectType == 'Account'){
@@ -88,80 +99,81 @@ public with sharing class GetMultiObjectRecord {
         }
         
         public void getSocialPosts(){
-            if(this.contactId != '')
-                socialPosts = [select id,Name,Parent.Name,MessageType,CreatedDate,Content,Who.Name from SocialPost where WhoId = :this.contactId];
-            else if(this.leadId != '')
-                socialPosts = [select id,Name,Parent.Name,MessageType,CreatedDate,Content,Who.Name from SocialPost where WhoId = :this.leadId];
+            if(SObjectUtil.isObjectExist('SocialPost')){
+                String getSocialPostsQuery = 'select id,Name,Parent.Name,MessageType,CreatedDate,Content,Who.Name from SocialPost where WhoId =\'';
+                if(this.contactId != ''){
+                    //socialPosts = [select id,Name,Parent.Name,MessageType,CreatedDate,Content,Who.Name from SocialPost where WhoId = :this.contactId];
+                    socialPosts = Database.query(getSocialPostsQuery + this.contactId + '\'');
+                }
+                else if(this.leadId != ''){
+                    //socialPosts = [select id,Name,Parent.Name,MessageType,CreatedDate,Content,Who.Name from SocialPost where WhoId = :this.leadId];
+                    socialPosts = Database.query(getSocialPostsQuery + this.leadId + '\'');
+                }
+            }
         }
         
         public  void getChatTranscripts(){
-            if(this.contactId != '')
-                chatsList = [SELECT id,CaseId,Name,UserAgent,Body,StartTime,ContactId,Contact.Name,CreatedDate from LiveChatTranscript where ContactId=: contactId ORDER BY StartTime DESC];
-            else if(this.leadId != '')
-                chatsList = [SELECT id,CaseId,Name,UserAgent,Body,StartTime,ContactId,Lead.Name,CreatedDate from LiveChatTranscript where LeadId=: leadId ORDER BY StartTime DESC];
+            if(SObjectUtil.isObjectExist('LiveChatTranscript')){
+                String getChatsQuery = 'SELECT id,CaseId,Name,UserAgent,Body,StartTime,ContactId,Contact.Name,CreatedDate from LiveChatTranscript where ';
+                if(this.contactId != '')
+                    chatsList = Database.query(getChatsQuery + 'ContactId = \'' + this.contactId + '\' ORDER BY StartTime DESC');
+                else if(this.leadId != '')
+                    chatsList = Database.query(getChatsQuery + 'LeadId = \'' + this.leadId + '\' ORDER BY StartTime DESC');
+                //chatsList = [SELECT id,CaseId,Name,UserAgent,Body,StartTime,ContactId,Lead.Name,CreatedDate from LiveChatTranscript where LeadId=: leadId ORDER BY StartTime DESC];
+            }
         }
         
         
         public void getConversationEntries() {
-            if(this.contactId != ''){
-                if(caseId == '' && !remainingRecords)
-                    this.messagingList = [SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate from MessagingSession where EndUserContactId =: contactId ORDER BY StartTime DESC];
-                else if(caseId != '' && !remainingRecords){
-                    this.messagingList = [SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate from MessagingSession where CaseId =: caseId ORDER BY StartTime DESC];
-                    caseIds.add(caseId);
-                }
-                else if ((caseId != '' && remainingRecords) || (caseId =='' && remainingRecords)){
-                    System.debug(caseIds);
-                    this.messagingList = [SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate from MessagingSession where CaseId NOT IN :caseIds AND  EndUserContactId =: contactId ORDER BY StartTime DESC];
-                }
-                
-                for(Integer i=0;i< this.messagingList.size();i++){
-                    List<ConversationEntry> messageEntryItems = [SELECT ActorName,ActorType,EntryType,Message FROM ConversationEntry WHERE EntryType = 'Text' AND ConversationId = :this.messagingList[i].Id];
-                    
-                    for (ConversationEntry entry : messageEntryItems) {
-                        if (entry.ActorType=='EndUser') {
-                            if (entry.Message==null) {
-                                this.transcriptCompiler = this.transcriptCompiler +this.messagingList[i].EndUserContact.Name + ': ' + '[Unsupported Object]' + '\n';
-                            } else {
-                                this.transcriptCompiler = this.transcriptCompiler + this.messagingList[i].EndUserContact.Name + ': ' + entry.Message + '\n';
-                            }          
-                        }
-                        else if(entry.ActorType == 'Agent'){
-                            this.transcriptCompiler = this.transcriptCompiler + entry.ActorName + ': ' + entry.Message + '\n';
-                        }
-                        else if (entry.ActorType=='Bot'){
-                            this.transcriptCompiler = this.transcriptCompiler + 'Me: ' + entry.Message + '\n';
-                        }
+            if(SObjectUtil.isObjectExist('MessagingSession')){
+                String query = 'SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate,MessagingEndUserId,MessagingEndUser.Contact.Name from MessagingSession where ';
+                if(this.contactId != ''){
+                    if(caseId == '' && !remainingRecords){
+                     	//this.messagingList = [SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate from MessagingSession where EndUserContactId =: contactId ORDER BY StartTime DESC];
+                     	this.messagingList = Database.query(query + 'EndUserContactId = \''+contactId+'\'ORDER BY StartTime DESC');   
+                    }    
+                    else if(caseId != '' && !remainingRecords){
+                        //this.messagingList = [SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate from MessagingSession where CaseId =: caseId ORDER BY StartTime DESC];
+                        this.messagingList = Database.query(query + 'CaseId = \''+caseId+'\'ORDER BY StartTime DESC');
+                        caseIds.add(caseId);
                     }
-                    
-                    this.messaging.add(new messagingWrapper(this.messagingList[i],this.transcriptCompiler));
-                    
+                    else if ((caseId != '' && remainingRecords) || (caseId =='' && remainingRecords)){
+                        //System.debug(caseIds);
+                        //this.messagingList = [SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate from MessagingSession where CaseId NOT IN :caseIds AND  EndUserContactId =: contactId ORDER BY StartTime DESC];
+                        String queryRR = 'SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate,MessagingEndUserId,MessagingEndUser.Contact.Name from MessagingSession where CaseId NOT IN :caseIds AND  EndUserContactId =: contactId ORDER BY StartTime DESC';
+                        this.messagingList = Database.query(queryRR);
+                    }
+                    getConversationItemsHelper();
                 }
+                else if(this.leadId != ''){
+                    String queryLead = 'SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate,MessagingEndUserId,MessagingEndUser.Contact.Name from MessagingSession where CaseId NOT IN :caseIds AND  LeadId =\''+leadId+'\' ORDER BY StartTime DESC';
+                    //this.messagingList = [SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate from MessagingSession where CaseId NOT IN :caseIds AND  LeadId = :leadId ORDER BY StartTime DESC];
+                    this.messagingList = Database.query(queryLead);
+                    getConversationItemsHelper();
+                }   
             }
-            else if(this.leadId != ''){
-                this.messagingList = [SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate from MessagingSession where CaseId NOT IN :caseIds AND  LeadId = :leadId ORDER BY StartTime DESC];
-                for(Integer i=0;i< this.messagingList.size();i++){
-                    List<ConversationEntry> messageEntryItems = [SELECT ActorName,ActorType,EntryType,Message FROM ConversationEntry WHERE EntryType = 'Text' AND ConversationId = :this.messagingList[i].Id];
-                    
-                    for (ConversationEntry entry : messageEntryItems) {
-                        if (entry.ActorType=='EndUser') {
-                            if (entry.Message==null) {
-                                this.transcriptCompiler = this.transcriptCompiler +this.messagingList[i].EndUserContact.Name + ': ' + '[Unsupported Object]' + '\n';
-                            } else {
-                                this.transcriptCompiler = this.transcriptCompiler + this.messagingList[i].EndUserContact.Name + ': ' + entry.Message + '\n';
-                            }          
-                        }
-                        else if(entry.ActorType == 'Agent'){
-                            this.transcriptCompiler = this.transcriptCompiler + entry.ActorName + ': ' + entry.Message + '\n';
-                        }
-                        else if (entry.ActorType=='Bot'){
-                            this.transcriptCompiler = this.transcriptCompiler + 'Me: ' + entry.Message + '\n';
-                        }
+        }
+        
+        public void getConversationItemsHelper(){
+            for(Integer i=0;i< this.messagingList.size();i++){
+                String getConvQuery = 'SELECT ActorName,ActorType,EntryType,Message FROM ConversationEntry WHERE EntryType = \'Text\' AND ConversationId =\''+messagingList[i].get('Id')+'\'';
+                List<SObject> messageEntryItems = Database.query(getConvQuery);
+                for (Sobject entry : messageEntryItems) {
+                    if (String.valueOf(entry.get('ActorType')) == 'EndUser') {
+                        if (String.valueOf(entry.get('Message'))==null) {
+                            this.transcriptCompiler = this.transcriptCompiler +this.messagingList[i].getSObject('MessagingEndUser').getSObject('Contact').get('Name') + ': ' + '[Unsupported Object]' + '\n';
+                        } else {
+                            this.transcriptCompiler = this.transcriptCompiler + this.messagingList[i].getSObject('MessagingEndUser').getSObject('Contact').get('Name') + ': ' + String.valueOf(entry.get('Message')) + '\n';
+                        }          
                     }
-                    
-                    this.messaging.add(new messagingWrapper(this.messagingList[i],this.transcriptCompiler));
-                    
+                    else if(String.valueOf(entry.get('ActorType')) == 'Agent'){
+                        this.transcriptCompiler = this.transcriptCompiler + String.valueOf(entry.get('ActorType')) + ': ' + String.valueOf(entry.get('Message')) + '\n';
+                    }
+                    else if (String.valueOf(entry.get('ActorType')) == 'Bot'){
+                        this.transcriptCompiler = this.transcriptCompiler + 'Me: ' + String.valueOf(entry.get('Message')) + '\n';
+                    }
                 }
+                this.messaging.add(new messagingWrapper(this.messagingList[i],this.transcriptCompiler));
             }
         }
         
@@ -201,11 +213,11 @@ public with sharing class GetMultiObjectRecord {
     
     public class messagingWrapper{
         @AuraEnabled 
-        public MessagingSession messagingSession;
+        public SObject messagingSession;
         @AuraEnabled
         public String messagingSessionData;
         
-        messagingWrapper(MessagingSession messagingSession, String messagingSessionData){
+        messagingWrapper(SObject messagingSession, String messagingSessionData){
             this.messagingSession = messagingSession;
             this.messagingSessionData = messagingSessionData;
         }
