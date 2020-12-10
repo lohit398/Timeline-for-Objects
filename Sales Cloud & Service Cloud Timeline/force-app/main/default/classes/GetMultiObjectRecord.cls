@@ -16,7 +16,7 @@ public with sharing class GetMultiObjectRecord {
         	wrapperObject.getConversationEntries();
         if(SObjectUtil.isObjectExist('SocialPost'))
         	wrapperObject.getSocialPosts();
-        
+        //System.debug(wrapperObject);
         return wrapperObject;
     }
     public class Wrapper{
@@ -29,9 +29,9 @@ public with sharing class GetMultiObjectRecord {
         @AuraEnabled
         public list<Case> caseList {get;set;}
         @AuraEnabled
-        public list<SObject> messagingList {get;set;}
+        public list<SObject> messagingList = new List<SObject>();
         @AuraEnabled
-        public list<SObject> chatsList {get;set;}
+        public list<SObject> chatsList = new List<SObject>();
         @AuraEnabled
         public String transcriptCompiler ='';
         @AuraEnabled
@@ -41,7 +41,7 @@ public with sharing class GetMultiObjectRecord {
         @AuraEnabled
         public List<Task> callTasks;
         @AuraEnabled
-        public List<SObject> socialPosts;
+        public List<SObject> socialPosts = new List<SObject>();
         @AuraEnabled
         public String contactId;
         @AuraEnabled
@@ -81,7 +81,10 @@ public with sharing class GetMultiObjectRecord {
                 this.leadId = '';
             }
             else if(sObjectType == 'Account'){
-                contactId = [SELECT PersonContactId from Account where Id =: this.recordId LIMIT 1].PersonContactId;
+                //contactId = [SELECT PersonContactId from Account where Id =: this.recordId LIMIT 1].PersonContactId;
+                String query3 = 'SELECT PersonContactId from Account where Id =\''+this.recordId+'\'this.recordId LIMIT 1';
+                SObject personAccount = Database.query(query3);
+                contactId = String.valueOf(personAccount.get('PersonContactId'));
                 this.leadId = '';
             }
             else if(sObjectType == 'Lead'){

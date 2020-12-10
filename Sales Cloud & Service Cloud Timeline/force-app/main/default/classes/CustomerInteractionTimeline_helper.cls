@@ -8,8 +8,13 @@ public class CustomerInteractionTimeline_helper {
     
     @AuraEnabled(cacheable=true)
     public static Boolean isPersonAccount(Id recordId){
-        Account acc = [SELECT Id,IsPersonAccount from Account WHERE Id =:recordId];
-        return acc.IsPersonAccount;
+        //Account acc = [SELECT Id,IsPersonAccount from Account WHERE Id =:recordId];
+        String query = 'SELECT Id,IsPersonAccount from Account WHERE Id =\''+recordId+'\'';
+        SObject sobj = Database.query(query);
+        if(String.valueOf(sobj.get('IsPersonAccount')) == 'true')
+            return true;
+       	else
+            return false;
     }
     
     @AuraEnabled(cacheable=true)

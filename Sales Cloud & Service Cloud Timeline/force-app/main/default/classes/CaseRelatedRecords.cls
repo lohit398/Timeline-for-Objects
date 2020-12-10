@@ -4,15 +4,15 @@ public with sharing class CaseRelatedRecords {
         @AuraEnabled
         public Case c = new Case();        
         @AuraEnabled
-        public list<SObject> chatsList {get;set;}
+        public list<SObject> chatsList = new List<SObject>();
         @AuraEnabled
-        public list<Task> emailMessages;
+        public list<Task> emailMessages = new List<Task>();
         @AuraEnabled
-        public List<Task> callTasks;
+        public List<Task> callTasks = new List<Task>();
         @AuraEnabled
-        public List<SObject> socialPosts;
+        public List<SObject> socialPosts = new List<SObject>();
         @AuraEnabled
-        public List<GetMultiObjectRecord.messagingWrapper> messagingList;
+        public List<GetMultiObjectRecord.messagingWrapper> messagingList = new List<GetMultiObjectRecord.messagingWrapper>();
     }
     @AuraEnabled(cacheable=true)
     public static List<Case> getRelatedCases(String contactId){
@@ -22,8 +22,12 @@ public with sharing class CaseRelatedRecords {
     public static CaseWrapper unrelatedRecords(Id contactId,List<Id> cases){
         CaseWrapper cWrapperUnrelated = new CaseWrapper();
         //cWrapperUnrelated.chatsList = [SELECT id,CaseId,Name,UserAgent,Body,StartTime,ContactId,Contact.Name,CreatedDate from LiveChatTranscript where ContactId =: contactId AND CaseId NOT IN: cases ORDER BY StartTime DESC];
-        String chatsListQuery = 'SELECT id,CaseId,Name,UserAgent,Body,StartTime,ContactId,Contact.Name,CreatedDate from LiveChatTranscript where ContactId =\''+contactId+'\'AND CaseId NOT IN: cases ORDER BY StartTime DESC';
-        cWrapperUnrelated.chatsList = Database.query(chatsListQuery);
+        
+        if(SObjectUtil.isObjectExist('LiveChatTranscript')){
+            String chatsListQuery = 'SELECT id,CaseId,Name,UserAgent,Body,StartTime,ContactId,Contact.Name,CreatedDate from LiveChatTranscript where ContactId =\''+contactId+'\'AND CaseId NOT IN: cases ORDER BY StartTime DESC';
+            cWrapperUnrelated.chatsList = Database.query(chatsListQuery);
+        }
+        
         cWrapperUnrelated.emailMessages = [SELECT Description,Who.Name,WhoId,CreatedDate,Priority,Subject FROM Task WHERE Type = 'Email' AND whatId NOT IN: cases AND WhoId =: contactId];
         List<Task> eM = new List<Task>();
         for(Task t: cWrapperUnrelated.emailMessages){
@@ -34,15 +38,20 @@ public with sharing class CaseRelatedRecords {
         cWrapperUnrelated.emailMessages =eM;
         cWrapperUnrelated.callTasks = [select Id,Type,what.Name,who.Name,ActivityDate,Subject,Status,Description,createddate from task where Type='call' AND whatId NOT IN: cases AND WhoId =: contactId ORDER BY createddate DESC];
         //cWrapperUnrelated.socialPosts =[select id,Name,Parent.Name,MessageType,CreatedDate,Content,Who.Name from SocialPost where ParentId NOT IN: cases and WhoId =: contactId];
-        String socialPostsQuery = 'select id,Name,Parent.Name,MessageType,CreatedDate,Content,Who.Name from SocialPost where ParentId NOT IN :cases and WhoId = \''+contactId+'\'';
-        cWrapperUnrelated.socialPosts = Database.query(socialPostsQuery);
+        if(SObjectUtil.isObjectExist('SocialPost')){
+            String socialPostsQuery = 'select id,Name,Parent.Name,MessageType,CreatedDate,Content,Who.Name from SocialPost where ParentId NOT IN :cases and WhoId = \''+contactId+'\'';
+        	cWrapperUnrelated.socialPosts = Database.query(socialPostsQuery);
+        }
         GetMultiObjectRecord.Wrapper obj = new GetMultiObjectRecord.Wrapper();
         obj.caseId = '';
         obj.caseIds = cases;
         obj.contactId = contactId;
         obj.remainingRecords = true;
-        obj.getConversationEntries();
+        if(SObjectUtil.isObjectExist('MessagingSession')){
+        	obj.getConversationEntries();
+        }
         cWrapperUnrelated.messagingList = obj.messaging;
+        System.debug(cWrapperUnrelated);
         return cWrapperUnrelated;
     }
     
@@ -60,9 +69,13 @@ public with sharing class CaseRelatedRecords {
             CaseWrapper cW = new CaseWrapper();
             cW.c = item;
             caseIds.add(item.Id);
-            //cW.chatsList = [SELECT id,CaseId,Name,UserAgent,Body,StartTime,ContactId,Contact.Name,CreatedDate from LiveChatTranscript where CaseId=: item.Id ORDER BY StartTime DESC];
-            String queryChatList = 'SELECT id,CaseId,Name,UserAgent,Body,StartTime,ContactId,Contact.Name,CreatedDate from LiveChatTranscript where CaseId= \''+item.Id+'\' ORDER BY StartTime DESC';
-            cW.chatsList = Database.query(queryChatList);
+            
+            if(SObjectUtil.isObjectExist('LiveChatTranscript')){
+                //cW.chatsList = [SELECT id,CaseId,Name,UserAgent,Body,StartTime,ContactId,Contact.Name,CreatedDate from LiveChatTranscript where CaseId=: item.Id ORDER BY StartTime DESC];
+                String queryChatList = 'SELECT id,CaseId,Name,UserAgent,Body,StartTime,ContactId,Contact.Name,CreatedDate from LiveChatTranscript where CaseId= \''+item.Id+'\' ORDER BY StartTime DESC';
+            	cW.chatsList = Database.query(queryChatList);
+            }
+            
             cW.emailMessages = [SELECT Description,Who.Name,WhoId,CreatedDate,Priority,Subject FROM Task WHERE Type = 'Email' AND whatId =: item.Id];
             List<Task> eM = new List<Task>();
             for(Task t: cW.emailMessages){
@@ -73,18 +86,22 @@ public with sharing class CaseRelatedRecords {
             cW.emailMessages =eM;
             cW.callTasks = [select Id,Type,what.Name,who.Name,ActivityDate,Subject,Status,Description,createddate from task where Type='call' and whatId =: item.Id ORDER BY createddate DESC];
             //cW.socialPosts = [select id,Name,Parent.Name,MessageType,CreatedDate,Content,Who.Name from SocialPost where ParentId =: item.Id];
-            String querySocialPosts = 'select id,Name,Parent.Name,MessageType,CreatedDate,Content,Who.Name from SocialPost where ParentId = \''+item.Id+'\'';
-            cW.socialPosts = Database.query(querySocialPosts);
-            
+            if(SObjectUtil.isObjectExist('SocialPost')){
+                String querySocialPosts = 'select id,Name,Parent.Name,MessageType,CreatedDate,Content,Who.Name from SocialPost where ParentId = \''+item.Id+'\'';
+            	cW.socialPosts = Database.query(querySocialPosts);
+            }
             GetMultiObjectRecord.Wrapper obj = new GetMultiObjectRecord.Wrapper();
             obj.caseId = item.Id;
-            obj.getConversationEntries();
-            cW.messagingList = obj.messaging;
+            if(SObjectUtil.isObjectExist('MessagingSession')){
+                obj.getConversationEntries();
+            	cW.messagingList = obj.messaging;
+            }
             caseWrapperList.add(cW);            
         }
         CaseWrapper cW = new CaseWrapper();
         cW = unrelatedRecords(contactId,caseIds);
         caseWrapperList.add(cW);
+        System.debug(caseWrapperList);
         return caseWrapperList;
     }
 }
