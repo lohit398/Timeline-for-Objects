@@ -8,4 +8,7 @@
     <template if:true={_isOpportunity}>
         <c-opportunity-timeline record-id={recordId}></c-opportunity-timeline>
     </template>
+    <template if:true={_wrongObject}>
+        <c-cit_illustration object-name = {__objectName}></c-cit_illustration>
+    </template>
 </template>
