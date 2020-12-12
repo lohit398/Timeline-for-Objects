@@ -4,6 +4,8 @@
     </template>
     <template if:true={expandList}>
         <c-customer-interaction-timeline values-array={sortedArray}></c-customer-interaction-timeline>
-        
+        <div class="slds-align_absolute-center">
+            <lightning-button label="View More" onclick={handleLoadMore}></lightning-button>
+        </div>
     </template>
 </template>

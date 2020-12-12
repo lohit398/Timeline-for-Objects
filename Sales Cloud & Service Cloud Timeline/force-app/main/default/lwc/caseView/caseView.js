@@ -36,7 +36,7 @@ export default class CaseView extends LightningElement {
             return d - c;
         });
 
-        this.sortedArray = this.relatedLists;
+        this.sortedArray = this.relatedLists.slice(0,4);
     }
 
 
@@ -60,7 +60,6 @@ export default class CaseView extends LightningElement {
             });
             this.responseArray[this.responseArray.length - 1].Id = "No_case_attached";
             this.sortedArray = JSON.parse(JSON.stringify(this.responseArray));
-
         }
     }
 
@@ -72,6 +71,18 @@ export default class CaseView extends LightningElement {
             this.expandList = true;
         else if (selectedId === this.itemId && this.expandList === true)
             this.expandList = false;
+    }
+
+    handleLoadMore(){
+        if (this.relatedLists.length != this.sortedArray.length) {
+            //console.log(this.total.length - this.showcase.length);
+            if (this.relatedLists.length - this.sortedArray.length > 5) {
+                this.sortedArray = this.sortedArray.concat(this.relatedLists.slice(this.sortedArray.length,this.sortedArray.length + 5));
+            }
+            else {
+                this.sortedArray = this.sortedArray.concat(this.relatedLists.slice(this.sortedArray.length,this.relatedLists.length));
+            }
+        }
     }
 
 }
