@@ -1,9 +1,15 @@
 public class CustomerInteractionTimeline_helper {
     
     @AuraEnabled(cacheable=true)
-    public static String getObjectName(Id recordId){
+    public static Map<String,String> getObjectName(Id recordId){
         String sObjName = recordId.getSObjectType().getDescribe().getName();
-        return sObjName;
+        Map<String,String> objectDetails = new Map<String,String>();
+        objectDetails.put('apiName', sObjName);
+        String objectName = objectDetails.get('apiName');
+        List<Schema.DescribeSObjectResult> describeSobjectsResult = Schema.describeSObjects(new List<String>{objectName});
+        String objectLabel = describeSobjectsResult[0].getLabel();
+        objectDetails.put('objectName', objectLabel);
+        return objectDetails;
     }
     
     @AuraEnabled(cacheable=true)
@@ -13,7 +19,7 @@ public class CustomerInteractionTimeline_helper {
         SObject sobj = Database.query(query);
         if(String.valueOf(sobj.get('IsPersonAccount')) == 'true')
             return true;
-       	else
+        else
             return false;
     }
     

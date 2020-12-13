@@ -52,38 +52,94 @@ public with sharing class GetMultiObjectRecord {
         
         public void getContactId() {
             if(sObjectType == 'Case') {
-                contactId = [SELECT ContactId FROM Case WHERE Id =: this.recordId LIMIT 1].ContactId;
+                List<String> fieldNames = new List<String>{'ContactId'};
+                    String objName = 'Case';
+                if(FLSCheck_apex.isAccessible(fieldNames, objName)){
+                    contactId = [SELECT ContactId FROM Case WHERE Id =: this.recordId LIMIT 1].ContactId;
+                }
+                else{
+                    contactId = '';
+                }
+                
                 this.leadId = '';
             } else if(sObjectType == 'LiveChatTranscript') {
-                String query= 'SELECT ContactId From LiveChatTranscript WHERE Id =\''+String.valueOf(this.recordId)+'\' LIMIT 1';
-                SObject chatContact = Database.query(query);
-                contactId = String.valueOf(chatContact.get('ContactId'));
+                
+                List<String> fieldNames = new List<String>{'ContactId'};
+                    String objName = 'LiveChatTranscript';
+                if(FLSCheck_apex.isAccessible(fieldNames, objName)){
+                    String query= 'SELECT ContactId From LiveChatTranscript WHERE Id =\''+String.valueOf(this.recordId)+'\' LIMIT 1';
+                    SObject chatContact = Database.query(query);
+                    contactId = String.valueOf(chatContact.get('ContactId'));
+                }else{
+                    contactId = '';
+                }
+                
                 this.leadId = '';
             }
             else if(sObjectType == 'Task') {
-                contactId = [SELECT WhoId From Task WHERE Id =: this.recordId LIMIT 1].WhoId;
+                
+                List<String> fieldNames = new List<String>{'WhoId'};
+                    String objName = 'Task';
+                if(FLSCheck_apex.isAccessible(fieldNames, objName)){
+                    contactId = [SELECT WhoId From Task WHERE Id =: this.recordId LIMIT 1].WhoId;
+                }else{
+                    contactId = '';
+                }
+                
                 this.leadId = '';
             } else if(sObjectType == 'MessagingSession') {
-                String query1= 'SELECT EndUserContactId From MessagingSession WHERE Id =\''+String.valueOf(this.recordId)+'\' LIMIT 1';
-                SObject messagingContact = Database.query(query1);
-                contactId = String.valueOf(messagingContact.get('EndUserContactId'));
+                
+                List<String> fieldNames = new List<String>{'EndUserContactId'};
+                    String objName = 'MessagingSession';
+                if(FLSCheck_apex.isAccessible(fieldNames, objName)){
+                    String query1= 'SELECT EndUserContactId From MessagingSession WHERE Id =\''+String.valueOf(this.recordId)+'\' LIMIT 1';
+                    SObject messagingContact = Database.query(query1);
+                    contactId = String.valueOf(messagingContact.get('EndUserContactId'));
+                }else{
+                    contactId = '';
+                }
+                
                 this.leadId = '';
             }
             else if(sObjectType == 'Contact'){
-                contactId = [SELECT Id FROM Contact WHERE Id =: this.recordId LIMIT 1].Id;
+                
+                List<String> fieldNames = new List<String>{'Id'};
+                    String objName = 'Contact';
+                if(FLSCheck_apex.isAccessible(fieldNames, objName)){
+                    contactId = [SELECT Id FROM Contact WHERE Id =: this.recordId LIMIT 1].Id;
+                }else{
+                    contactId = '';
+                }
+                
                 this.leadId = '';
             }
             else if(sObjectType == 'SocialPost'){
-                String query2 = 'SELECT WhoId From SocialPost WHERE Id =\''+String.valueOf(this.recordId)+'\' LIMIT 1';
-                SObject socialPostContact = Database.query(query2);
-                contactId = String.valueOf(socialPostContact.get('WhoId'));
+                
+                List<String> fieldNames = new List<String>{'WhoId'};
+                    String objName = 'SocialPost';
+                if(FLSCheck_apex.isAccessible(fieldNames, objName)){
+                    String query2 = 'SELECT WhoId From SocialPost WHERE Id =\''+String.valueOf(this.recordId)+'\' LIMIT 1';
+                    SObject socialPostContact = Database.query(query2);
+                    contactId = String.valueOf(socialPostContact.get('WhoId'));
+                }else{
+                    contactId = '';
+                }
+                
                 this.leadId = '';
             }
             else if(sObjectType == 'Account'){
                 //contactId = [SELECT PersonContactId from Account where Id =: this.recordId LIMIT 1].PersonContactId;
-                String query3 = 'SELECT PersonContactId from Account where Id =\''+this.recordId+'\'this.recordId LIMIT 1';
-                SObject personAccount = Database.query(query3);
-                contactId = String.valueOf(personAccount.get('PersonContactId'));
+                List<String> fieldNames = new List<String>{'PersonContactId'};
+                    String objName = 'Account';
+                if(FLSCheck_apex.isAccessible(fieldNames, objName)){
+                    String query3 = 'SELECT PersonContactId from Account where Id =\''+this.recordId+'\'this.recordId LIMIT 1';
+                    SObject personAccount = Database.query(query3);
+                    contactId = String.valueOf(personAccount.get('PersonContactId'));
+                }
+                else{
+                    contactId = '';
+                }
+                
                 this.leadId = '';
             }
             else if(sObjectType == 'Lead'){
@@ -94,57 +150,108 @@ public with sharing class GetMultiObjectRecord {
         
         
         public  void getCases(){
-            if(this.contactId != '')
-                caseList = [SELECT id,CaseNumber,Subject,Description,CreatedDate,Owner.Name,Status from Case where ContactId =: contactId ORDER BY CreatedDate DESC]; // no lead field on case
+            if(this.contactId != ''){
+                List<String> fieldNames = new List<String>{'CaseNumber','Subject','Description','CreatedDate','OwnerId','Status','ContactId'};
+                    String objName = 'Case';
+                if(FLSCheck_apex.isAccessible(fieldNames, objName)){
+                    caseList = [SELECT id,CaseNumber,Subject,Description,CreatedDate,Owner.Name,Status from Case where ContactId =: contactId ORDER BY CreatedDate DESC];
+                }
+                else{
+                    caseList = new List<Case>();
+                }
+            }
             else
                 caseList = new List<Case>();
         }
         
         public void getSocialPosts(){
             if(SObjectUtil.isObjectExist('SocialPost')){
+                List<String> fieldNames = new List<String>{'Name','ParentId','MessageType','CreatedDate','Content','WhoId'};
+                    String objName = 'SocialPost';
                 String getSocialPostsQuery = 'select id,Name,Parent.Name,MessageType,CreatedDate,Content,Who.Name from SocialPost where WhoId =\'';
-                if(this.contactId != ''){
-                    socialPosts = Database.query(getSocialPostsQuery + this.contactId + '\'');
+                
+                if(FLSCheck_apex.isAccessible(fieldNames, objName)){
+                    if(this.contactId != ''){
+                        socialPosts = Database.query(getSocialPostsQuery + this.contactId + '\'');
+                    }
+                    else if(this.leadId != ''){
+                        socialPosts = Database.query(getSocialPostsQuery + this.leadId + '\'');
+                    }
+                }else{
+                    socialPosts = new List<SObject>();
                 }
-                else if(this.leadId != ''){
-                    socialPosts = Database.query(getSocialPostsQuery + this.leadId + '\'');
-                }
+                
             }
         }
         
         public  void getChatTranscripts(){
             if(SObjectUtil.isObjectExist('LiveChatTranscript')){
                 String getChatsQuery = 'SELECT id,CaseId,Name,UserAgent,Body,StartTime,ContactId,Contact.Name,CreatedDate from LiveChatTranscript where ';
-                if(this.contactId != '')
-                    chatsList = Database.query(getChatsQuery + 'ContactId = \'' + this.contactId + '\' ORDER BY StartTime DESC');
-                else if(this.leadId != '')
-                    chatsList = Database.query(getChatsQuery + 'LeadId = \'' + this.leadId + '\' ORDER BY StartTime DESC');
+                List<String> fieldNames = new List<String>{'CaseId','Name','UserAgent','Body','StartTime','ContactId','CreatedDate'};
+                    String objName = 'LiveChatTranscript';
+                if(FLSCheck_apex.isAccessible(fieldNames, objName)){
+                    if(this.contactId != '')
+                        chatsList = Database.query(getChatsQuery + 'ContactId = \'' + this.contactId + '\' ORDER BY StartTime DESC');
+                    else if(this.leadId != ''){
+                        List<String> leadFields = new List<String>{'LeadId'};
+                            if(FLSCheck_apex.isAccessible(leadFields, objName))
+                            chatsList = Database.query(getChatsQuery + 'LeadId = \'' + this.leadId + '\' ORDER BY StartTime DESC');
+                        else
+                            chatsList = new List<SObject>();
+                    }
+                }else{
+                    chatsList = new List<SObject>();
+                }
+                
             }
         }
         
         
         public void getConversationEntries() {
             if(SObjectUtil.isObjectExist('MessagingSession')){
-                String query = 'SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate,MessagingEndUserId,MessagingEndUser.Contact.Name from MessagingSession where ';
-                if(this.contactId != ''){
-                    if(caseId == '' && !remainingRecords){
-                        this.messagingList = Database.query(query + 'EndUserContactId = \''+contactId+'\'ORDER BY StartTime DESC');   
-                    }    
-                    else if(caseId != '' && !remainingRecords){
-                        this.messagingList = Database.query(query + 'CaseId = \''+caseId+'\'ORDER BY StartTime DESC');
-                        caseIds.add(caseId);
+                
+                //String getConvQuery = 'SELECT ActorName,ActorType,EntryType,Message,ConversationId,CreatedDate FROM ConversationEntry WHERE EntryType = \'Text\' AND ConversationId IN :messagingListIds ORDER BY CreatedDate ASC';
+                List<String> fieldNames = new List<String>{'CaseId','Name','ChannelName','ChannelType','StartTime','EndUserAccountId','CreatedDate','OwnerId','EndUserContactId','MessagingEndUserId'};
+                    String objName = 'MessagingSession';
+                List<String> fieldNames1 = new List<String>{'ActorName','ActorType','EntryType','Message','ConversationId','CreatedDate'};
+                    String objName1 = 'ConversationEntry';
+                List<String> contactFields = new List<String>{'Name'};
+                    String objName2 = 'Contact';
+                
+                if(FLSCheck_apex.isAccessible(fieldNames, objName) && FLSCheck_apex.isAccessible(fieldNames1, objName1) && FLSCheck_apex.isAccessible(contactFields, objName2)){
+                    String query = 'SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate,MessagingEndUserId,MessagingEndUser.Contact.Name from MessagingSession where ';
+                    if(this.contactId != ''){
+                        if(caseId == '' && !remainingRecords){
+                            this.messagingList = Database.query(query + 'EndUserContactId = \''+contactId+'\'ORDER BY StartTime DESC');   
+                        }    
+                        else if(caseId != '' && !remainingRecords){
+                            this.messagingList = Database.query(query + 'CaseId = \''+caseId+'\'ORDER BY StartTime DESC');
+                            caseIds.add(caseId);
+                        }
+                        else if ((caseId != '' && remainingRecords) || (caseId =='' && remainingRecords)){
+                            String queryRR = 'SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate,MessagingEndUserId,MessagingEndUser.Contact.Name from MessagingSession where CaseId NOT IN :caseIds AND  EndUserContactId =: contactId ORDER BY StartTime DESC';
+                            this.messagingList = Database.query(queryRR);
+                        }
+                        getConversationItemsHelper();
                     }
-                    else if ((caseId != '' && remainingRecords) || (caseId =='' && remainingRecords)){
-                        String queryRR = 'SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate,MessagingEndUserId,MessagingEndUser.Contact.Name from MessagingSession where CaseId NOT IN :caseIds AND  EndUserContactId =: contactId ORDER BY StartTime DESC';
-                        this.messagingList = Database.query(queryRR);
-                    }
-                    getConversationItemsHelper();
+                    else if(this.leadId != ''){
+                        List<String> leadFields = new List<String>{'LeadId'};
+                            if(FLSCheck_apex.isAccessible(leadFields, objName)){
+                                String queryLead = 'SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate,MessagingEndUserId,MessagingEndUser.Contact.Name from MessagingSession where CaseId NOT IN :caseIds AND  LeadId =\''+leadId+'\' ORDER BY StartTime DESC';
+                                this.messagingList = Database.query(queryLead);
+                                getConversationItemsHelper();
+                            }
+                        else{
+                            this.messagingList = new List<SObject>();
+                            this.transcriptCompiler = '';
+                            this.messaging = new List<messagingWrapper>();
+                        }
+                    }      
+                }else{
+                    this.messagingList = new List<SObject>();
+                    this.transcriptCompiler = '';
+                    this.messaging = new List<messagingWrapper>();
                 }
-                else if(this.leadId != ''){
-                    String queryLead = 'SELECT id,CaseId,Name,StartTime,EndUserAccountId,ChannelName,ChannelType,EndUserAccount.Name,owner.Name,EndUserContact.Name,createddate,MessagingEndUserId,MessagingEndUser.Contact.Name from MessagingSession where CaseId NOT IN :caseIds AND  LeadId =\''+leadId+'\' ORDER BY StartTime DESC';
-                    this.messagingList = Database.query(queryLead);
-                    getConversationItemsHelper();
-                }   
             }
         }
         
@@ -153,7 +260,7 @@ public with sharing class GetMultiObjectRecord {
             for(Integer i=0;i< this.messagingList.size();i++){
                 messagingListIds.add(String.valueOf(messagingList[i].get('id')));
             }
-            String getConvQuery = 'SELECT ActorName,ActorType,EntryType,Message,ConversationId,CreatedDate FROM ConversationEntry WHERE EntryType = \'Text\' AND ConversationId IN :messagingListIds ORDER BY CreatedDate';
+            String getConvQuery = 'SELECT ActorName,ActorType,EntryType,Message,ConversationId,CreatedDate FROM ConversationEntry WHERE EntryType = \'Text\' AND ConversationId IN :messagingListIds ORDER BY CreatedDate ASC';
             List<SObject> messageEntry = Database.query(getConvQuery);
             
             Map<String,List<SObject>> messageEntryMap = new Map<String,List<SObject>>();
@@ -195,34 +302,33 @@ public with sharing class GetMultiObjectRecord {
         }
         
         public void getEmails(){
-            if(this.contactId != ''){
-                emailMessages = [SELECT Description,Who.Name,WhoId,CreatedDate,Priority,Subject FROM Task WHERE Type = 'Email' AND WhoId =: contactId];
-                List<Task> eM = new List<Task>();
-                for(Task t: emailMessages){
-                    if(t.Subject.indexOf('[') != -1)
-                        t.Subject = t.Subject.substring(0,t.Subject.indexOf('['));
-                    em.add(t);
+            List<String> fieldNames = new List<String>{'Description','WhoId','Priority','Subject','Type','CreatedDate'};
+                String objName = 'Task';
+            if(FLSCheck_apex.isAccessible(fieldNames, objName)){
+                if(this.contactId != ''){
+                    emailMessages = [SELECT Description,Who.Name,WhoId,CreatedDate,Priority,Subject FROM Task WHERE Type = 'Email' AND WhoId =: contactId];
                 }
-                emailMessages =eM;
-            }
-            else if(this.leadId != ''){
-                emailMessages = [SELECT Description,Who.Name,WhoId,CreatedDate,Priority,Subject FROM Task WHERE Type = 'Email' AND WhoId =: leadId];
-                List<Task> eM = new List<Task>();
-                for(Task t: emailMessages){
-                    if(t.Subject.indexOf('[') != -1)
-                        t.Subject = t.Subject.substring(0,t.Subject.indexOf('['));
-                    em.add(t);
+                else if(this.leadId != ''){
+                    emailMessages = [SELECT Description,Who.Name,WhoId,CreatedDate,Priority,Subject FROM Task WHERE Type = 'Email' AND WhoId =: leadId];
                 }
-                emailMessages =eM;
+            }else{
+                emailMessages = new List<Task>();
             }
+            
         }
         
         public void getTasks(){
-            if(this.contactId != ''){
-                callTasks = [select Id,Type,what.Name,who.Name,ActivityDate,Subject,Status,Description,createddate from task where Type='call' and WhoId =: contactId ORDER BY createddate DESC];
-            }
-            else if(this.leadId != ''){
-                callTasks = [select Id,Type,what.Name,who.Name,ActivityDate,Subject,Status,Description,createddate from task where Type='call' and WhoId =: leadId ORDER BY createddate DESC];
+            List<String> fieldNames = new List<String>{'Description','WhoId','Subject','Type','CreatedDate','Status','ActivityDate','WhatId'};
+                String objName = 'Task';
+            if(FLSCheck_apex.isAccessible(fieldNames, objName)){
+                if(this.contactId != ''){
+                    callTasks = [select Id,Type,what.Name,who.Name,ActivityDate,Subject,Status,Description,createddate from task where Type='call' and WhoId =: contactId ORDER BY createddate DESC];
+                }
+                else if(this.leadId != ''){
+                    callTasks = [select Id,Type,what.Name,who.Name,ActivityDate,Subject,Status,Description,createddate from task where Type='call' and WhoId =: leadId ORDER BY createddate DESC];
+                }
+            }else{
+                callTasks = new List<Task>();   
             }
         }
         
