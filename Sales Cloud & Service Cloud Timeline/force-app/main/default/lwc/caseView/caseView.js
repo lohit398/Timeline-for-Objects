@@ -23,7 +23,7 @@ export default class CaseView extends LightningElement {
         this.relatedLists = this.relatedLists.concat(value.emailMessages);
         this.relatedLists = this.relatedLists.concat(value.messagingList);
         this.relatedLists = this.relatedLists.concat(value.socialPosts);
-        
+
         this.relatedLists.sort((a, b) => {
             let d =
                 b.CreatedDate != undefined
@@ -36,7 +36,7 @@ export default class CaseView extends LightningElement {
             return d - c;
         });
 
-        this.sortedArray = this.relatedLists.slice(0,4);
+        this.sortedArray = this.relatedLists.slice(0, 4);
     }
 
 
@@ -67,22 +67,25 @@ export default class CaseView extends LightningElement {
         registerListener('selectedId', this.expand, this);
     }
     expand(selectedId) {
-        if (selectedId === this.itemId && this.expandList === false)
+        if (selectedId === this.itemId && this.expandList === false) {
             this.expandList = true;
+        }
         else if (selectedId === this.itemId && this.expandList === true)
             this.expandList = false;
     }
 
-    handleLoadMore(){
+    handleLoadMore() {
         if (this.relatedLists.length != this.sortedArray.length) {
-            //console.log(this.total.length - this.showcase.length);
             if (this.relatedLists.length - this.sortedArray.length > 5) {
-                this.sortedArray = this.sortedArray.concat(this.relatedLists.slice(this.sortedArray.length,this.sortedArray.length + 5));
+                this.sortedArray = this.sortedArray.concat(this.relatedLists.slice(this.sortedArray.length, this.sortedArray.length + 5));
             }
-            else {
-                this.sortedArray = this.sortedArray.concat(this.relatedLists.slice(this.sortedArray.length,this.relatedLists.length));
+            else if (this.relatedLists.length - this.sortedArray.length < 5) {
+                this.sortedArray = this.sortedArray.concat(this.relatedLists.slice(this.sortedArray.length, this.relatedLists.length));
+                this.template.querySelector('lightning-button').disabled = true;
             }
         }
+        else {
+            this.template.querySelector('lightning-button').disabled = true;
+        }
     }
-
 }
