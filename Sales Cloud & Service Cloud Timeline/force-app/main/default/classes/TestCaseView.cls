@@ -1,5 +1,5 @@
 @isTest
-public class TestContactView {
+public class TestCaseView {
     static testMethod void wrapperTestgetContactId(){
         Case c = new Case();
         c.ContactId = '0035g000002TTshAAG';
@@ -20,13 +20,15 @@ public class TestContactView {
         l.LiveChatVisitorId = '5715g000000wnB5AAI';
         INSERT l;
         
+        
+        
         Task t = new Task();
         t.WhoId = '0035g000002TTshAAG';
         t.Type = 'call';
         t.Status = 'Completed';
         t.Subject = 'Inbound call on Wed, Jun 28, 2017 10:48 AM';
         INSERT t;
-
+        
         Task t_e = new Task();
         t_e.WhoId = '0035g000002TTshAAG';
         t_e.Type = 'Email';
@@ -35,8 +37,8 @@ public class TestContactView {
         INSERT t_e;
         
         /*MessagingSession m = new MessagingSession();
-        m.EndUserContactId = '0032w00000C6g9NAAR';
-        INSERT m;*/
+		m.EndUserContactId = '0032w00000C6g9NAAR';
+		INSERT m;*/
         
         Contact cnct = new Contact();
         cnct.FirstName ='CIT';
@@ -49,6 +51,7 @@ public class TestContactView {
         t_e_cnct.WhoId = cnct.Id;
         t_e_cnct.Type = 'Email';
         t_e_cnct.Status = 'Completed';
+        t_e_cnct.WhatId = c.Id;
         t_e_cnct.Subject = 'Inbound call on Wed, Jun 28, 2017 10:48 AM';
         INSERT t_e_cnct;
         
@@ -57,30 +60,38 @@ public class TestContactView {
         t_cnct.Type = 'call';
         t_cnct.Status = 'Completed';
         t_cnct.Subject = 'Inbound call on Wed, Jun 28, 2017 10:48 AM';
+        t_cnct.WhatId = c.Id;
         INSERT t_cnct;
-       
+        
         LiveChatTranscript l_cnct = new LiveChatTranscript();
         l_cnct.ContactId = cnct.Id;
         l_cnct.ChatKey = 'Z1234567890fghjk';
         l_cnct.LiveChatVisitorId = '5715g000000wnB5AAI';
         INSERT l_cnct;
-		
-		Case c_cnct = new Case();
+        
+        Case c_cnct = new Case();
         c_cnct.ContactId = cnct.Id;
         c_cnct.Status ='New';
         c_cnct.Priority = 'Medium';
         INSERT c_cnct;    
         
+        LiveChatTranscript l_case = new LiveChatTranscript();
+        l_case.ContactId = cnct.Id;
+        l_case.ChatKey = 'Z1234567890fghjk';
+        l_case.LiveChatVisitorId = '5715g000000wnB5AAI';
+        l_case.CaseId = c.Id;
+        INSERT l_case;
+        
         
         MessagingSession s = new MessagingSession();
         MessagingEndUser mu = new MessagingEndUser();
-		mu.ContactId = cnct.Id;
+        mu.ContactId = cnct.Id;
         mu.Name = 'CIT';
         mu.MessagingPlatformKey = 'Test Class Key';
         mu.MessageType = 'Facebook';
         mu.MessagingChannelId = '0Mj5g000000k9diCAA';
         INSERT mu;
-		s.MessagingEndUserId =  mu.Id;
+        s.MessagingEndUserId =  mu.Id;
         s.MessagingChannelId = '0Mj5g000000k9diCAA';
         s.Status = 'Ended';
         INSERT s;
@@ -121,78 +132,19 @@ public class TestContactView {
         INSERT new_entry_bot;
         
         test.startTest();
-        
-        GetMultiObjectRecord.Wrapper w = GetMultiObjectRecord.getRecords(c.Id);
-        w.getContactId();
-        System.assertEquals(w.contactId, '0035g000002TTshAAG');
-        System.assertEquals(w.caseList.size(), 1);
-        System.assertEquals(w.emailMessages.size(), 1);
-        System.assertEquals(w.chatsList.size(), 1);
-        System.assertEquals(w.callTasks.size(), 1);
-        System.assertEquals(w.socialPosts.size(), 0);
-        System.assertEquals(w.messagingList.size(), 0);
-        
-		GetMultiObjectRecord.Wrapper w_l = GetMultiObjectRecord.getRecords(l.Id);
-        w_l.getContactId();
-        System.assertEquals(w_l.contactId, '0035g000002TTshAAG');       
-        System.assertEquals(w_l.chatsList.size(), 1);
-        System.assertEquals(w_l.emailMessages.size(), 1);
-        System.assertEquals(w_l.callTasks.size(), 1);
-        System.assertEquals(w_l.socialPosts.size(), 0);
-        System.assertEquals(w.messagingList.size(), 0);
-        
-        GetMultiObjectRecord.Wrapper w_T = GetMultiObjectRecord.getRecords(t.Id);
-        w_T.getContactId();
-        System.assertEquals(w_T.contactId, '0035g000002TTshAAG'); 
-        System.assertEquals(w_T.leadId, '');
-        System.assertEquals(w_T.callTasks.size(), 1);
-        System.assertEquals(w_T.chatsList.size(), 1);
-        System.assertEquals(w_T.emailMessages.size(), 1);
-        System.assertEquals(w_T.socialPosts.size(), 0);
-
-        
-        GetMultiObjectRecord.Wrapper w_C = GetMultiObjectRecord.getRecords(cnct.Id);
-        w_C.getContactId();
-        System.assertEquals(w_C.contactId, cnct.Id);
-        System.assertEquals(w_C.leadId, '');
-        System.assertEquals(w_C.callTasks.size(), 1);
-        System.assertEquals(w_C.chatsList.size(), 1);
-        System.assertEquals(w_C.emailMessages.size(), 1);
-        System.assertEquals(w_C.socialPosts.size(), 0);
-        System.assertEquals(w_C.messagingList.size(), 1);
-        
-        
-        GetMultiObjectRecord.Wrapper w_M = GetMultiObjectRecord.getRecords(s.Id);
-        w_M.getContactId();
-        System.assertEquals(w_M.contactId, cnct.Id);
-        System.assertEquals(w_M.leadId, '');
-        System.assertEquals(w_M.caseList.size(), 1);
-        System.assertEquals(w_M.emailMessages.size(), 1);
-        System.assertEquals(w_M.chatsList.size(), 1);
-        System.assertEquals(w_M.callTasks.size(), 1);
-        System.assertEquals(w_M.socialPosts.size(), 0);
-        System.assertEquals(w_M.messagingList.size(), 1);
-        
-        
-        GetMultiObjectRecord.Wrapper w_lead = GetMultiObjectRecord.getRecords(new_lead.Id);
-        w_lead.getContactId();
-        System.assertEquals(w_lead.contactId, '');
-        System.assertEquals(w_lead.leadId, new_lead.Id);
-       	System.assertEquals(w_lead.caseList.size(), 0);
-        System.assertEquals(w_lead.emailMessages.size(), 0);
-        System.assertEquals(w_lead.chatsList.size(), 0);
-        System.assertEquals(w_lead.callTasks.size(), 0);
-        System.assertEquals(w_lead.socialPosts.size(), 0);
-        System.assertEquals(w_lead.messagingList.size(), 0);
-        
-        GetMultiObjectRecord.Wrapper w_caseView = GetMultiObjectRecord.getRecords(cnct.Id);
-        w_caseView.caseId = c_cnct.Id;
-        System.debug(w_caseView.caseId);
-        w_caseView.remainingRecords = true;
-        w_caseView.getContactId();
-        System.assertEquals(w_caseView.messagingList.size(), 1);
+        List<Id> case_list = new List<Id>();
+        case_list.add(c.Id);
+        case_list.add(c_cnct.Id);
+        Id contactId = Id.valueOf('0035g000002TTshAAG');
+        System.assertEquals(CaseRelatedRecords.getRelatedCases('0035g000002TTshAAG').size(), 1);
+        System.assertEquals(CaseRelatedRecords.unrelatedRecords(contactId,case_list).chatsList.size(),1);
+        System.assertEquals(CaseRelatedRecords.unrelatedRecords(contactId,case_list).emailMessages.size(),1);
+        System.assertEquals(CaseRelatedRecords.unrelatedRecords(contactId,case_list).callTasks.size(),1);
+        System.assertEquals(CaseRelatedRecords.unrelatedRecords(contactId,case_list).socialPosts.size(),0);
+        System.assertEquals(CaseRelatedRecords.getRelatedRecords(c.Id).size(), 2);
         
         test.stopTest();
+        
         
     }
 }

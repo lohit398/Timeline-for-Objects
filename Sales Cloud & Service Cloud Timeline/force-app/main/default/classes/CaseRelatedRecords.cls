@@ -95,8 +95,8 @@ public with sharing class CaseRelatedRecords {
         Map<String,List<SObject>> socialPostCases = new Map<String,List<SObject>>();
         List<String> socialFields = new List<String>{'Name','ParentId','MessageType','CreatedDate','Content','WhoId'};
             String socialObj = 'SocialPost';
-        if(FLSCheck_apex.isAccessible(socialFields, socialObj)){
-            if(SObjectUtil.isObjectExist('SocialPost')){
+        if(SObjectUtil.isObjectExist('SocialPost')){
+        	if(FLSCheck_apex.isAccessible(socialFields, socialObj)){
                 String querySocialPosts = 'select id,Name,Parent.Name,MessageType,CreatedDate,Content,Who.Name,ParentId from SocialPost where ParentId IN :caseIds';
                 List<SObject> socialPostsList = Database.query(querySocialPosts);
                 for(Integer i=0;i<socialPostsList.size();i++){
@@ -121,8 +121,8 @@ public with sharing class CaseRelatedRecords {
             String liveChatObj = 'LiveChatTranscript';
         Map<String,List<SObject>> chatsCases = new Map<String,List<SObject>>();
         
-        if(FLSCheck_apex.isAccessible(liveChatFields, liveChatObj)){
-            if(SObjectUtil.isObjectExist('LiveChatTranscript')){
+        if(SObjectUtil.isObjectExist('LiveChatTranscript')){
+        	if(FLSCheck_apex.isAccessible(liveChatFields, liveChatObj)){
                 String queryChatList = 'SELECT id,CaseId,Name,UserAgent,Body,StartTime,ContactId,Contact.Name,CreatedDate from LiveChatTranscript where CaseId IN :caseIds ORDER BY StartTime DESC';
                 List<SObject> chatList = Database.query(queryChatList);
                 for(Integer i=0;i<chatList.size();i++){
